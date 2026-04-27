@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Formulaire étudiant</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/script.js}"></script>
+</head>
+
+<body>
+
+<div class="header">
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <strong>Erreur :</strong> <span th:text="${errorMessage}"></span>
+    </div>
+    <h2>Formulaire étudiant 💚</h2>
+</div>
+
+<div class="container">
+
+    <form th:action="@{/etudiants}" th:object="${etudiant}" method="post">
+
+        <!-- ID -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <h3>Informations personnelles</h3>
+
+        <input type="text" th:field="*{nom}" placeholder="Nom" required/>
+        <input type="text" th:field="*{prenom}" placeholder="Prénom" required/>
+        <input type="text" th:field="*{username}" placeholder="Username"/>
+
+        <input type="password" th:field="*{motDePasse}" placeholder="Mot de passe" required/>
+        <input type="email" th:field="*{email}" placeholder="Email"/>
+        <input type="text" th:field="*{telephone}" placeholder="Téléphone"/>
+
+        <h3>Accès système</h3>
+
+        <!-- ROLE -->
+        <label>Rôle</label>
+        <select th:field="*{role}">
+            <option th:each="r : ${T(com.fst.gestionpresencepointage.models.enums.RoleUtilisateur).values()}"
+                    th:value="${r}"
+                    th:text="${r}">
+            </option>
+        </select>
+
+        <!-- STATUT -->
+        <label>Statut du compte</label>
+        <select th:field="*{statut}">
+            <option th:value="true">Actif</option>
+            <option th:value="false">Inactif</option>
+        </select>
+
+        <h3>Informations académiques</h3>
+
+        <input type="text" th:field="*{matricule}" placeholder="Matricule" required/>
+        <input type="text" th:field="*{niveau}" placeholder="Niveau"/>
+
+        <label>Département</label>
+        <select th:field="*{departementId}" required>
+            <option value="">-- Choisir département --</option>
+            <option th:each="d : ${departements}"
+                    th:value="${d.id}"
+                    th:text="${d.nom}">
+            </option>
+        </select>
+
+        <h3>Informations complémentaires</h3>
+
+        <input type="text" th:field="*{adresse}" placeholder="Adresse"/>
+        <input type="text" th:field="*{lieuNaissance}" placeholder="Lieu de naissance"/>
+
+        <label>Date de naissance</label>
+        <input type="date" th:field="*{dateNaissance}"/>
+
+        <input type="text" th:field="*{personneAContacter}" placeholder="Personne à contacter"/>
+
+        <br><br>
+
+        <button type="submit"
+                onclick="this.disabled=true; this.form.submit();"
+        >Enregistrer</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

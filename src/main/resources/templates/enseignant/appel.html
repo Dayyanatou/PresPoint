@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Faire l'appel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Feuille de présence — Séance #<span th:text="${seanceId}"></span></h5>
+            <a th:href="@{/enseignant/dashboard/{id}(id=${enseignant.id})}" class="btn btn-sm btn-light">
+                <i class="fas fa-arrow-left me-1"></i>Retour
+            </a>
+        </div>
+        <div class="card-body">
+            <div th:if="${presences.isEmpty()}" class="text-center text-muted py-5">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <p>Aucun étudiant inscrit pour cette séance.</p>
+                <small>Les présences sont générées automatiquement lors de la création de la séance.</small>
+            </div>
+
+            <form th:if="${!presences.isEmpty()}"
+                  th:action="@{/enseignant/seance/{sid}/appel/{eid}(sid=${seanceId},eid=${enseignant.id})}"
+                  method="post">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>#</th>
+                            <th>Étudiant</th>
+                            <th>Statut actuel</th>
+                            <th>Marquer</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="presence, iter : ${presences}">
+                            <td th:text="${iter.count}"></td>
+                            <td>
+                                <i class="fas fa-user-graduate me-2 text-primary"></i>
+                                <span th:text="${presence.etudiantNom + ' ' + presence.etudiantPrenom}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${presence.statut.name() == 'PRESENT'}" class="badge bg-success">Présent</span>
+                                <span th:if="${presence.statut.name() == 'ABSENT'}" class="badge bg-danger">Absent</span>
+                                <span th:if="${presence.statut.name() == 'JUSTIFIE'}" class="badge bg-warning text-dark">Justifié</span>
+                            </td>
+                            <td>
+                                <select th:name="'statut_' + ${presence.id}" class="form-select form-select-sm w-auto">
+                                    <option value="PRESENT" th:selected="${presence.statut.name() == 'PRESENT'}">✅ Présent</option>
+                                    <option value="ABSENT" th:selected="${presence.statut.name() == 'ABSENT'}">❌ Absent</option>
+                                    <option value="JUSTIFIE" th:selected="${presence.statut.name() == 'JUSTIFIE'}">📋 Justifié</option>
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a th:href="@{/enseignant/dashboard/{id}(id=${enseignant.id})}"
+                       class="btn btn-outline-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer l'appel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

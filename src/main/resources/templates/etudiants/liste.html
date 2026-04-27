@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Étudiants</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success fw-bold d-flex align-items-center gap-2">
+            🎓 Liste des Étudiants
+        </h2>
+        <a th:href="@{/etudiants/new}" class="btn btn-success btn-lg shadow">
+            <i class="bi bi-plus-circle me-2"></i> Nouvel Étudiant
+        </a>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+        <strong>Erreur :</strong> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-success">
+                <tr>
+                    <th>Matricule</th>
+                    <th>Nom Complet</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Niveau</th>
+                    <th>Département</th>
+                    <th>Statut</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${etudiants}">
+                    <td th:text="${e.matricule}"></td>
+                    <td th:text="${e.nom + ' ' + e.prenom}"></td>
+                    <td th:text="${e.email}"></td>
+                    <td th:text="${e.telephone}"></td>
+                    <td th:text="${e.niveau}"></td>
+                    <td th:text="${e.departementNom}"></td>
+                    <td>
+                        <span th:if="${e.statut}" class="badge bg-success px-3 py-2">Actif</span>
+                        <span th:if="${!e.statut}" class="badge bg-danger px-3 py-2">Inactif</span>
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <!-- Bouton Modifier -->
+                            <a th:href="@{/etudiants/edit/{id}(id=${e.id})}"
+                               class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i> Modifier
+                            </a>
+
+                            <!-- Bouton Supprimer -->
+                            <form th:action="@{/etudiants/delete/{id}(id=${e.id})}"
+                                  method="post" style="display: inline;">
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Voulez-vous vraiment supprimer cet étudiant ?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(etudiants)}">
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        Aucun étudiant enregistré pour le moment.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+<!--<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Étudiants</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    &lt;!&ndash; Bootstrap 5 &ndash;&gt;
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success fw-bold">
+            🎓 Liste des Étudiants
+        </h2>
+        <a th:href="@{/etudiants/new}" class="btn btn-success btn-lg shadow-sm">
+            <i class="bi bi-plus-circle"></i> Nouvel Étudiant
+        </a>
+    </div>
+
+    &lt;!&ndash; Message d'erreur &ndash;&gt;
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+        <strong>Erreur :</strong> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-success">
+                <tr>
+                    <th>Matricule</th>
+                    <th>Nom Complet</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Niveau</th>
+                    <th>Département</th>
+                    <th>Statut</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${etudiants}">
+                    <td th:text="${e.matricule}"></td>
+                    <td th:text="${e.nom + ' ' + e.prenom}"></td>
+                    <td th:text="${e.email}"></td>
+                    <td th:text="${e.telephone}"></td>
+                    <td th:text="${e.niveau}"></td>
+                    <td th:text="${e.departementNom}"></td>
+                    <td>
+                        <span th:if="${e.statut}" class="badge bg-success">Actif</span>
+                        <span th:if="${!e.statut}" class="badge bg-danger">Inactif</span>
+                    </td>
+                    <td class="text-center">
+                        <a th:href="@{/etudiants/edit/{id}(id=${e.id})}"
+                           class="btn btn-warning btn-sm me-2">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <form th:action="@{/etudiants/delete/{id}(id=${e.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Supprimer cet étudiant ?')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(etudiants)}">
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        Aucun étudiant enregistré pour le moment.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>-->
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des étudiants</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/script.js}"></script>
+</head>
+<body>
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Liste des étudiants</h2>
+        <a href="/etudiants/new" class="btn btn-primary">
+            + Nouvel étudiant
+        </a>
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Matricule</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Niveau</th>
+            <th>Département</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        &lt;!&ndash; th:each = boucle sur la liste "etudiants" envoyée par le Controller &ndash;&gt;
+        <tr th:each="etudiant : ${etudiants}">
+            <td th:text="${etudiant.matricule}">matricule</td>
+            &lt;!&ndash; th:text = affiche la valeur du champ &ndash;&gt;
+            <td th:text="${etudiant.nom}">nom</td>
+            <td th:text="${etudiant.prenom}">prenom</td>
+            <td th:text="${etudiant.niveau}">niveau</td>
+            <td th:text="${etudiant.departementNom}">département</td>
+            <td>
+                &lt;!&ndash; th:href = construit l'URL dynamiquement avec l'id &ndash;&gt;
+                <a th:href="@{/etudiants/{id}(id=${etudiant.id})}"
+                   class="btn btn-sm btn-warning">Modifier</a>
+                <button class="btn btn-sm btn-danger"
+                        th:onclick="|confirmerSuppression(${etudiant.id})|">
+                    Supprimer
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function confirmerSuppression(id) {
+        if (confirm("Supprimer cet étudiant ?")) {
+            fetch(`/api/etudiants/${id}`, { method: 'DELETE' })
+                .then(() => location.reload());
+        }
+    }
+</script>
+</body>
+</html>
+-->
+
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liste des étudiants</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">🎓 Liste des étudiants</h2>
+
+        <a th:href="@{/etudiants/new}" class="btn btn-success">
+            ➕ Ajouter
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered align-middle">
+
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Matricule</th>
+                    <th>Niveau</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="e : ${etudiants}">
+                    <td th:text="${e.id}"></td>
+                    <td th:text="${e.nom}"></td>
+                    <td th:text="${e.prenom}"></td>
+                    <td th:text="${e.matricule}"></td>
+                    <td th:text="${e.niveau}"></td>
+
+                    <td>
+                        <a th:href="@{/etudiants/edit/{id}(id=${e.id})}"
+                           class="btn btn-warning btn-sm">✏️</a>
+
+                        <a th:href="@{/etudiants/delete/{id}(id=${e.id})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Supprimer cet étudiant ?')">
+                            🗑
+                        </a>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(etudiants)}">
+                    <td colspan="6" class="text-center text-muted">
+                        Aucun étudiant trouvé
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>-->

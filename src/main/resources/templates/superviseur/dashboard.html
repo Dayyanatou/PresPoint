@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Dashboard Superviseur — ' + ${superviseur.prenom}">Dashboard Superviseur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/dashboard-superviseur-vert.css}">
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Espace Superviseur — FST</div>
+    </div>
+
+    <div class="user-block">
+        <div class="avatar">
+            <span th:text="${#strings.substring(superviseur.prenom,0,1) + #strings.substring(superviseur.nom,0,1)}">SU</span>
+        </div>
+        <div>
+            <div class="u-name" th:text="${superviseur.prenom + ' ' + superviseur.nom}">Admin Système</div>
+            <div class="u-info">Superviseur</div>
+        </div>
+    </div>
+
+    <div class="nav-section">Mon espace</div>
+
+    <a class="nav-item active" th:href="@{/superviseur/dashboard/{id}(id=${superviseur.id})}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Tableau de bord
+    </a>
+
+    <a class="nav-item" href="#">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Historique
+    </a>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Déconnexion
+        </a>
+    </div>
+</aside>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<main class="main-content">
+
+    <header class="topbar">
+        <div>
+            <h1>Tableau de bord</h1>
+            <small class="text-muted">Rôle : <span class="badge bg-light text-dark">Superviseur</span></small>
+            <span class="date-badge" th:text="${#dates.format(#dates.createNow(), 'EEEE dd MMMM yyyy')}">
+                Lundi 21 avril 2026
+            </span>
+        </div>
+        <div class="alerts-badge">
+            <span class="badge badge-alert">
+                <i class="fas fa-bell me-1"></i>
+                <span th:text="${nbEnAttente}">0</span> alertes
+            </span>
+        </div>
+    </header>
+
+    <div class="page-content">
+
+        <!-- ===== CARTES STATISTIQUES ===== -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-primary">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-value-primary" th:text="${nbEnAttente}">0</div>
+                <div class="stat-label">Demandes en attente</div>
+            </div>
+        </div>
+
+        <!-- ===== DEMANDES DE VALIDATION ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-list-check me-2"></i>Demandes de validation</h3>
+            </div>
+
+            <div class="empty-msg" th:if="${pointagesEnAttente.isEmpty()}">
+                <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                Aucun pointage en attente pour le moment.
+            </div>
+
+            <div th:unless="${pointagesEnAttente.isEmpty()}">
+                <div class="pointage-item" th:each="p : ${pointagesEnAttente}">
+                    <div class="pointage-left">
+                        <div class="avatar-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div>
+                            <div class="pointage-name" th:text="${p.enseignantNom}">Marie Dupont</div>
+                            <div class="pointage-detail">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                <span th:text="${p.date}">19/04/2026</span>
+                                &nbsp;|&nbsp;
+                                <i class="far fa-clock me-1"></i>
+                                <span th:text="${p.heureDebut}">08h00</span> - <span th:text="${p.heureFin}">10h00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pointage-actions">
+                        <form th:action="@{/superviseur/pointage/{pid}/confirmer/{sid}(pid=${p.id},sid=${superviseur.id})}"
+                              method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fas fa-check me-1"></i>Valider
+                            </button>
+                        </form>
+                        <form th:action="@{/superviseur/pointage/{pid}/rejeter/{sid}(pid=${p.id},sid=${superviseur.id})}"
+                              method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-times me-1"></i>Rejeter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script th:src="@{/js/dashboard-superviseur.js}"></script>
+</body>
+</html>
+
+-->
+
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Superviseur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { &#45;&#45;couleur: #006064; &#45;&#45;couleur-light: #e0f2f1; }
+        body { background:#f0f7f7; margin:0; }
+        .sidebar { background:var(&#45;&#45;couleur); min-height:100vh; width:240px; position:fixed; top:0; left:0; z-index:100; }
+        .sidebar-brand { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.15); }
+        .sidebar-brand h6 { color:#fff; font-weight:600; margin:0; font-size:1rem; }
+        .sidebar-brand small { color:rgba(255,255,255,0.65); font-size:0.75rem; }
+        .sidebar .nav-link { color:rgba(255,255,255,0.8); padding:11px 20px; font-size:0.9rem; display:flex; align-items:center; gap:10px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background:rgba(255,255,255,0.18); color:#fff; }
+        .sidebar .nav-link i { width:18px; text-align:center; }
+        .main { margin-left:240px; padding:30px; min-height:100vh; }
+        .topbar { background:#fff; border-radius:12px; padding:16px 24px; margin-bottom:24px; box-shadow:0 1px 6px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; }
+        .stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 6px rgba(0,0,0,0.06); border-top:4px solid var(&#45;&#45;couleur); }
+        .stat-card .val { font-size:2rem; font-weight:600; color:var(&#45;&#45;couleur); }
+        .stat-card .lbl { font-size:0.8rem; color:#888; margin-top:2px; }
+        .card-section { background:#fff; border-radius:12px; box-shadow:0 1px 6px rgba(0,0,0,0.06); margin-bottom:20px; }
+        .card-section .card-header { background:#fff; border-bottom:1px solid #e0f2f1; padding:16px 20px; border-radius:12px 12px 0 0; }
+        .card-section .card-header h6 { margin:0; font-weight:600; color:#333; }
+        .card-section .card-body { padding:16px 20px; }
+        .pointage-item { border-left:4px solid var(&#45;&#45;couleur); background:var(&#45;&#45;couleur-light); border-radius:0 8px 8px 0; padding:14px 16px; margin-bottom:12px; }
+        .btn-confirmer { background:var(&#45;&#45;couleur); border:none; color:#fff; padding:6px 14px; border-radius:6px; font-size:0.82rem; }
+        .btn-confirmer:hover { background:#004d51; color:#fff; }
+        .btn-rejeter { background:#b71c1c; border:none; color:#fff; padding:6px 14px; border-radius:6px; font-size:0.82rem; }
+        .btn-rejeter:hover { background:#7f0000; color:#fff; }
+        .sidebar-divider { border-color:rgba(255,255,255,0.15); margin:8px 16px; }
+    </style>
+</head>
+<body>
+
+&lt;!&ndash; Sidebar &ndash;&gt;
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <h6><i class="fas fa-user-shield me-2"></i>FST Présence</h6>
+        <small th:text="${superviseur.prenom + ' ' + superviseur.nom}"></small>
+    </div>
+    <nav class="nav flex-column mt-2">
+        <a class="nav-link active" th:href="@{/superviseur/dashboard/{id}(id=${superviseur.id})}">
+            <i class="fas fa-home"></i> Tableau de bord
+        </a>
+        <hr class="sidebar-divider">
+        <a class="nav-link" href="/login">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </nav>
+</div>
+
+&lt;!&ndash; Contenu principal &ndash;&gt;
+<div class="main">
+
+    &lt;!&ndash; Topbar &ndash;&gt;
+    <div class="topbar">
+        <div>
+            <h5 class="mb-0">Bonjour, <span th:text="${superviseur.prenom}"></span> 👋</h5>
+            <small class="text-muted">Superviseur de pointages</small>
+        </div>
+        <span class="badge" style="background:var(&#45;&#45;couleur);font-size:0.8rem;padding:6px 12px;border-radius:20px;color:#fff">
+            <i class="fas fa-clock me-1"></i>
+            <span th:text="${nbEnAttente}"></span> en attente
+        </span>
+    </div>
+
+    &lt;!&ndash; Stats &ndash;&gt;
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="val" th:text="${nbEnAttente}">0</div>
+                <div class="lbl"><i class="fas fa-hourglass-half me-1"></i>Pointages à confirmer</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="val text-success">—</div>
+                <div class="lbl"><i class="fas fa-check-double me-1"></i>Confirmés aujourd'hui</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="val text-danger">—</div>
+                <div class="lbl"><i class="fas fa-times me-1"></i>Rejetés aujourd'hui</div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Pointages en attente &ndash;&gt;
+    <div class="card-section">
+        <div class="card-header">
+            <h6><i class="fas fa-hourglass-half me-2" style="color:var(&#45;&#45;couleur)"></i>Pointages en attente de confirmation</h6>
+        </div>
+        <div class="card-body">
+            <div th:if="${pointagesEnAttente.isEmpty()}" class="text-center text-muted py-5">
+                <i class="fas fa-check-circle fa-3x mb-3 d-block" style="color:var(&#45;&#45;couleur)"></i>
+                <p class="fw-semibold">Tout est à jour !</p>
+                <small>Aucun pointage en attente de confirmation.</small>
+            </div>
+
+            <div th:each="p : ${pointagesEnAttente}" class="pointage-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-semibold">
+                            <i class="fas fa-chalkboard-teacher me-2 text-muted"></i>
+                            <span th:text="${p.enseignantNom}"></span>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span th:text="${p.date}"></span>
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-clock me-1"></i>
+                            <span th:text="${p.heureDebut + ' — ' + p.heureFin}"></span>
+                            &nbsp;·&nbsp;
+                            Durée : <span th:text="${p.duree}"></span> min
+                        </small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form th:action="@{/superviseur/pointage/{pid}/confirmer/{sid}(pid=${p.id},sid=${superviseur.id})}"
+                              method="post">
+                            <button type="submit" class="btn-confirmer">
+                                <i class="fas fa-check me-1"></i>Confirmer
+                            </button>
+                        </form>
+                        <form th:action="@{/superviseur/pointage/{pid}/rejeter/{sid}(pid=${p.id},sid=${superviseur.id})}"
+                              method="post">
+                            <button type="submit" class="btn-rejeter">
+                                <i class="fas fa-times me-1"></i>Rejeter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+&lt;!&ndash;
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Superviseur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background:#f4f6f9; }
+        .sidebar { background:#0F6E56; min-height:100vh; }
+        .sidebar .nav-link { color:rgba(255,255,255,0.8); padding:12px 20px; }
+        .sidebar .nav-link:hover { background:rgba(255,255,255,0.15); color:#fff; }
+        .sidebar-brand { padding:20px; color:#fff; font-size:1.1rem; font-weight:700; border-bottom:1px solid rgba(255,255,255,0.2); }
+        .main-content { padding:30px; }
+        .pointage-card { border-left:4px solid #0F6E56; border-radius:8px; margin-bottom:12px; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        &lt;!&ndash; Sidebar &ndash;&gt;
+        <div class="col-md-2 sidebar p-0">
+            <div class="sidebar-brand">
+                <i class="fas fa-user-shield me-2"></i>Superviseur
+            </div>
+            <nav class="nav flex-column mt-2">
+                <a class="nav-link" th:href="@{/superviseur/dashboard/{id}(id=${superviseur.id})}">
+                    <i class="fas fa-home me-2"></i>Tableau de bord
+                </a>
+                <hr style="border-color:rgba(255,255,255,0.2)">
+                <a class="nav-link" href="/login">
+                    <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                </a>
+            </nav>
+        </div>
+
+        &lt;!&ndash; Contenu &ndash;&gt;
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-0">Bonjour, <span th:text="${superviseur.prenom + ' ' + superviseur.nom}"></span> 👋</h4>
+                    <small class="text-muted">Superviseur de pointages</small>
+                </div>
+                <span class="badge bg-success fs-6">
+          <span th:text="${nbEnAttente}"></span> en attente
+        </span>
+            </div>
+
+            &lt;!&ndash; Stat &ndash;&gt;
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3 text-center">
+                        <div class="fs-1 fw-bold text-warning" th:text="${nbEnAttente}">0</div>
+                        <div class="text-muted">Pointages à confirmer</div>
+                    </div>
+                </div>
+            </div>
+
+            &lt;!&ndash; Pointages en attente &ndash;&gt;
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h5><i class="fas fa-clock text-warning me-2"></i>Pointages en attente de confirmation</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${pointagesEnAttente.isEmpty()}" class="text-center text-muted py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p>Aucun pointage en attente. Tout est à jour !</p>
+                    </div>
+
+                    <div th:each="pointage : ${pointagesEnAttente}" class="card pointage-card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>
+                                    <i class="fas fa-chalkboard-teacher me-2 text-muted"></i>
+                                    <span th:text="${pointage.enseignantNom}"></span>
+                                </strong>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <span th:text="${pointage.date}"></span>
+                                    &nbsp;|&nbsp;
+                                    <i class="fas fa-clock me-1"></i>
+                                    <span th:text="${pointage.heureDebut + ' — ' + pointage.heureFin}"></span>
+                                    &nbsp;|&nbsp;
+                                    Durée : <span th:text="${pointage.duree}"></span> min
+                                </small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <form th:action="@{/superviseur/pointage/{pid}/confirmer/{sid}(pid=${pointage.id},sid=${superviseur.id})}"
+                                      method="post">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check me-1"></i>Confirmer
+                                    </button>
+                                </form>
+                                <form th:action="@{/superviseur/pointage/{pid}/rejeter/{sid}(pid=${pointage.id},sid=${superviseur.id})}"
+                                      method="post">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times me-1"></i>Rejeter
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>&ndash;&gt;
+-->

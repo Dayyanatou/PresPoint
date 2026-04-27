@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Connexion — PresPoint</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/login.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <!-- Panneau gauche — branding -->
+    <div class="left-panel">
+        <div>
+            <div class="brand-logo">
+                <i class="fas fa-graduation-cap me-2"></i>PresPoint
+            </div>
+            <div class="brand-sub">Système de gestion des présences — FST</div>
+        </div>
+
+        <div class="brand-desc">
+            Gérez les <strong>présences</strong>, les <strong>pointages</strong>
+            et les <strong>justificatifs</strong> de notre faculté en toute simplicité.
+        </div>
+
+        <div>
+            <div class="roles-section-title">Accès selon votre rôle</div>
+            <div class="roles-list">
+                <div class="role-item">
+                    <div class="role-icon">👨‍💼</div>
+                    <div>
+                        <strong>Chef de Département</strong>
+                        <small>Gestion globale</small>
+                    </div>
+                </div>
+                <div class="role-item">
+                    <div class="role-icon">👨‍🏫</div>
+                    <div>
+                        <strong>Enseignant</strong>
+                        <small>Pointage et séances</small>
+                    </div>
+                </div>
+                <div class="role-item">
+                    <div class="role-icon">👨‍🎓</div>
+                    <div>
+                        <strong>Étudiant</strong>
+                        <small>Suivi de présence</small>
+                    </div>
+                </div>
+                <div class="role-item">
+                    <div class="role-icon">🔐</div>
+                    <div>
+                        <strong>Superviseur</strong>
+                        <small>Confirmation pointages</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panneau droit — formulaire -->
+    <div class="right-panel">
+        <h2>Connexion</h2>
+        <p class="subtitle">Entrez vos identifiants pour accéder à votre espace.</p>
+
+        <!-- Messages flash -->
+        <div class="alert alert-error" th:if="${erreur}" th:text="${erreur}"></div>
+        <div class="alert alert-success" th:if="${succes}" th:text="${succes}"></div>
+
+        <form th:action="@{/login}" method="post" class="login-form">
+
+            <div class="form-group">
+                <label>Nom d'utilisateur ou Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text"
+                           name="username"
+                           placeholder="Ex : dayyana@gmail.com"
+                           required
+                           autocomplete="username"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password"
+                           name="motDePasse"
+                           placeholder="Votre mot de passe"
+                           required
+                           autocomplete="current-password"/>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+            </button>
+
+        </form>
+
+        <div class="divider">ou</div>
+
+        <!-- Nouveau : Bouton pour créer compte étudiant -->
+        <a href="/inscription-etudiant" class="btn-signup">
+            <i class="fas fa-user-plus me-2"></i>Créer un compte étudiant
+        </a>
+
+        <a href="#" class="forgot-link">
+            <i class="fas fa-question-circle me-1"></i>Besoin d'aide ? Contactez l'administrateur
+        </a>
+
+        <!-- Boutons de test rapide pour la démo -->
+        <div class="demo-section">
+            <div class="demo-title">— Accès rapide pour tester —</div>
+            <div class="demo-btns">
+                <button type="button" class="demo-btn demo-etudiant"
+                        onclick="window.location.href='/etudiant/dashboard/12'">
+                    <i class="fas fa-user-graduate me-1"></i>Étudiant (ID 12)
+                </button>
+                <button type="button" class="demo-btn demo-chef"
+                        onclick="window.location.href='/chef/dashboard/1'">
+                    <i class="fas fa-user-tie me-1"></i>Chef (Dépt. 1)
+                </button>
+            </div>
+        </div>
+
+        <p class="footer-note">© 2026 FST — Faculté des Sciences et Techniques</p>
+    </div>
+
+</div>
+
+<script src="/js/login.js"></script>
+</body>
+</html>
+
+
+<!--
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Connexion — PresPoint</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #f0f2f5;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .login-wrapper {
+          display: flex;
+          width: 100%;
+          max-width: 900px;
+          min-height: 520px;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+          margin: 2rem;
+        }
+
+        /* Panneau gauche — branding */
+        .left-panel {
+          flex: 1;
+          background: linear-gradient(135deg, #0F6E56 0%, #1a237e 100%);
+          padding: 3rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          color: #fff;
+        }
+        .brand-logo { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+        .brand-sub  { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+        .brand-desc {
+          font-size: 15px; line-height: 1.7;
+          color: rgba(255,255,255,0.8);
+        }
+        .brand-desc strong { color: #fff; }
+        .roles-list { display: flex; flex-direction: column; gap: 10px; }
+        .role-item {
+          display: flex; align-items: center; gap: 10px;
+          font-size: 13px; color: rgba(255,255,255,0.8);
+        }
+        .role-dot {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: rgba(255,255,255,0.5); flex-shrink: 0;
+        }
+
+        /* Panneau droit — formulaire */
+        .right-panel {
+          width: 400px;
+          background: #fff;
+          padding: 3rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .right-panel h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+        .right-panel .subtitle { font-size: 13px; color: #7f8c8d; margin-bottom: 2rem; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #4a4a6a; display: block; margin-bottom: 6px; }
+        .form-group input {
+          width: 100%; padding: 11px 14px; font-size: 14px;
+          border: 1.5px solid #e8ecf0;
+          border-radius: 10px;
+          background: #f8f9fa;
+          color: #1a1a2e;
+          outline: none;
+          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus {
+          border-color: #0F6E56;
+          background: #fff;
+          box-shadow: 0 0 0 3px rgba(15,110,86,0.1);
+        }
+
+        .alert-error {
+          background: #f8d7da; border: 1px solid #f1c1c6;
+          border-radius: 8px; padding: 10px 14px;
+          font-size: 13px; color: #721c24; margin-bottom: 16px;
+        }
+        .alert-success {
+          background: #d4edda; border: 1px solid #b8dacc;
+          border-radius: 8px; padding: 10px 14px;
+          font-size: 13px; color: #155724; margin-bottom: 16px;
+        }
+
+        .btn-login {
+          width: 100%; padding: 13px;
+          background: #0F6E56; color: #fff;
+          border: none; border-radius: 10px;
+          font-size: 15px; font-weight: 600;
+          cursor: pointer; margin-top: 8px;
+          transition: background 0.2s, transform 0.1s;
+        }
+        .btn-login:hover { background: #085041; }
+        .btn-login:active { transform: scale(0.98); }
+
+        .forgot-link {
+          display: block; text-align: center;
+          font-size: 12px; color: #7f8c8d;
+          margin-top: 1rem; text-decoration: none;
+        }
+        .forgot-link:hover { color: #0F6E56; }
+
+        .footer-note {
+          font-size: 11px; color: #aaa;
+          text-align: center; margin-top: 2rem;
+        }
+
+        /* Demo : boutons de test rapide */
+        .demo-section { margin-top: 1.5rem; border-top: 1px solid #f0f0f0; padding-top: 1rem; }
+        .demo-title { font-size: 11px; color: #aaa; text-align: center; margin-bottom: 8px; }
+        .demo-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .demo-btn {
+          padding: 5px 12px; font-size: 11px; font-weight: 600;
+          border-radius: 6px; cursor: pointer; border: none;
+          transition: opacity 0.15s;
+        }
+        .demo-btn:hover { opacity: 0.8; }
+        .demo-etudiant { background: #e8eaf6; color: #1a237e; }
+        .demo-chef     { background: #e1f5ee; color: #0F6E56; }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    &lt;!&ndash; Panneau gauche &ndash;&gt;
+    <div class="left-panel">
+        <div>
+            <div class="brand-logo">PresPoint</div>
+            <div class="brand-sub">Système de gestion des présences + Pointages — FST</div>
+        </div>
+
+        <div class="brand-desc">
+            Gérez les <strong>présences</strong>, les <strong>pointages</strong>
+            et les <strong>justificatifs</strong> de notre faculté en toute simplicité.
+        </div>
+
+        <div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">
+                Accès selon votre rôle
+            </div>
+            <div class="roles-list">
+                <div class="role-item">
+                    <div class="role-dot"></div>
+                    Chef de Département — Gestion globale
+                </div>
+                <div class="role-item">
+                    <div class="role-dot"></div>
+                    Enseignant — Pointage et séances
+                </div>
+                <div class="role-item">
+                    <div class="role-dot"></div>
+                    Étudiant — Suivi de présence
+                </div>
+                <div class="role-item">
+                    <div class="role-dot"></div>
+                    Superviseur — Confirmation des pointages
+                </div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Panneau droit — formulaire &ndash;&gt;
+    <div class="right-panel">
+        <h2>Connexion</h2>
+        <p class="subtitle">Entrez vos identifiants pour accéder à votre espace.</p>
+
+        &lt;!&ndash; Messages flash &ndash;&gt;
+        <div class="alert-error"   th:if="${erreur}"  th:text="${erreur}"></div>
+        <div class="alert-success" th:if="${succes}"  th:text="${succes}"></div>
+
+        &lt;!&ndash;
+          th:action : URL du POST de connexion
+          Plus tard avec Spring Security ce sera /login en POST
+          Pour l'instant on fait une connexion manuelle
+        &ndash;&gt;
+        <form th:action="@{/login}" method="post">
+
+            <div class="form-group">
+                <label>Nom d'utilisateur ou Email</label>
+                <input type="text"
+                       name="username"
+                       placeholder="Ex : dayyana@gmail.com"
+                       required
+                       autocomplete="username"/>
+            </div>
+
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password"
+                       name="motDePasse"
+                       placeholder="Votre mot de passe"
+                       required
+                       autocomplete="current-password"/>
+            </div>
+
+            <button type="submit" class="btn-login">Se connecter</button>
+
+        </form>
+
+        <a href="#" class="forgot-link">Mot de passe oublié ? Contactez l'administrateur</a>
+
+        &lt;!&ndash; Boutons de test rapide pour la démo &ndash;&gt;
+        <div class="demo-section">
+            <div class="demo-title">— Accès rapide pour tester —</div>
+            <div class="demo-btns">
+                <button class="demo-btn demo-etudiant"
+                        onclick="window.location.href='/etudiant/dashboard/12'">
+                    Étudiant (ID 12)
+                </button>
+                <button class="demo-btn demo-chef"
+                        onclick="window.location.href='/chef/dashboard/1'">
+                    Chef (Dépt. 1)
+                </button>
+            </div>
+        </div>
+
+        <p class="footer-note">FST — Faculté des Sciences et Techniques</p>
+    </div>
+
+</div>
+
+</body>
+</html>-->

@@ -1,0 +1,97 @@
+/* ========================================
+   COULEURS PERSONNALISÉES - Vert émeraude
+   ======================================== */
+
+:root {
+    --emerald-color: #10b981;      /* Vert émeraude principal */
+    --emerald-dark: #059669;       /* Vert émeraude foncé (au survol) */
+    --emerald-light: #d1fae5;      /* Vert émeraude très clair (fond) */
+}
+
+/* ========================================
+   BOUTONS VERTS ÉMERAUDE
+   ======================================== */
+
+.btn-emerald {
+    background-color: var(--emerald-color);
+    border-color: var(--emerald-color);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--emerald-dark);
+    border-color: var(--emerald-dark);
+    color: white;
+}
+
+.btn-outline-emerald {
+    color: var(--emerald-color);
+    border-color: var(--emerald-color);
+}
+
+.btn-outline-emerald:hover {
+    background-color: var(--emerald-color);
+    border-color: var(--emerald-color);
+    color: white;
+}
+
+/* ========================================
+   ICÔNES VERTES ÉMERAUDE
+   ======================================== */
+
+.text-emerald {
+    color: var(--emerald-color) !important;
+}
+
+/* ========================================
+   BADGES VERTS ÉMERAUDE
+   ======================================== */
+
+.bg-emerald {
+    background-color: var(--emerald-color) !important;
+    color: white;
+}
+
+/* ========================================
+   ONGLETS ACTIFS (underline vert émeraude)
+   ======================================== */
+
+.nav-tabs .nav-link.active {
+    color: var(--emerald-color);
+    border-bottom: 3px solid var(--emerald-color);
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--emerald-dark);
+}
+
+/* ========================================
+   AMÉLIORATIONS D'APPARENCE GÉNÉRALE
+   ======================================== */
+
+.card {
+    border-radius: 8px;
+}
+
+.table-light {
+    background-color: var(--emerald-light);
+}
+
+h3, h5 {
+    font-weight: 600;
+}
+
+/* ========================================
+   RESPONSIVE (petits écrans)
+   ======================================== */
+
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.85rem;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}

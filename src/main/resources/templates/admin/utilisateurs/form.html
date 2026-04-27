@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Test Form</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/js/utilisateur.js}">
+    <link rel="stylesheet" th:href="@{/js/script.js}">
+
+
+</head>
+<body>
+
+<h2>Créer utilisateur</h2>
+
+<p th:if="${param.success}">
+    ✔ Compte créé !
+</p>
+
+<form th:action="@{/web/utilisateurs/save}" th:object="${utilisateur}" method="post">
+
+    <input type="text" th:field="*{nom}" placeholder="Nom"/><br><br>
+    <input type="text" th:field="*{prenom}" placeholder="Prénom"/><br><br>
+    <input type="email" th:field="*{email}" placeholder="Email"/><br><br>
+    <input type="text" th:field="*{username}" placeholder="Username"/><br><br>
+    <input type="password" th:field="*{motDePasse}" placeholder="Mot de passe"/><br><br>
+
+    <!-- ROLE -->
+    <select th:field="*{role}" id="roleSelect">
+        <option value="">-- Choisir rôle --</option>
+        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+    </select>
+
+    <br><br>
+
+    <!-- ETUDIANT -->
+    <div id="etudiantFields" style="display:none;">
+        <input type="text" th:field="*{matricule}" placeholder="Matricule"/>
+        <input type="text" th:field="*{niveau}" placeholder="Niveau"/>
+    </div>
+
+    <!-- ENSEIGNANT -->
+    <div id="enseignantFields" style="display:none;">
+        <input type="text" th:field="*{grade}" placeholder="Grade"/>
+        <input type="text" th:field="*{specialite}" placeholder="Spécialité"/>
+    </div>
+
+    <br>
+
+    <button type="submit">Créer</button>
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Dashboard Enseignant — ' + ${enseignant.prenom}">Dashboard Enseignant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/dashboard-enseignant-turquoise.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Espace Enseignant — FST</div>
+    </div>
+
+    <div class="user-block">
+        <div class="avatar">
+            <span th:text="${#strings.substring(enseignant.prenom,0,1) + #strings.substring(enseignant.nom,0,1)}">EN</span>
+        </div>
+        <div>
+            <div class="u-name" th:text="${enseignant.prenom + ' ' + enseignant.nom}">Marie Dupont</div>
+            <div class="u-info" th:text="${enseignant.grade}">Professeur</div>
+        </div>
+    </div>
+
+    <div class="nav-section">Mon espace</div>
+
+    <a th:href="@{/enseignant/dashboard/{id}(id=${enseignant.id})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Tableau de bord
+    </a>
+
+    <a th:href="@{/enseignant/seances/{id}(id=${enseignant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Mes séances
+    </a>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<div class="main-content">
+
+    <div class="topbar">
+        <div>
+            <h1>Tableau de bord</h1>
+            <small class="text-muted" th:text="${enseignant.specialite}">Spécialité</small>
+        </div>
+        <span class="date-badge" th:text="${#dates.format(#dates.createNow(), 'EEEE dd MMMM yyyy')}">
+            Lundi 21 avril 2026
+        </span>
+    </div>
+
+    <div class="page-content">
+
+        <!-- ===== CARTES STATISTIQUES ===== -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-primary">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-value-primary" th:text="${nbSeancesAujourdhui}">0</div>
+                <div class="stat-label">Séances aujourd'hui</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-success">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-value-success" th:text="${nbSeancesSemaine}">0</div>
+                <div class="stat-label">Séances cette semaine</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-info">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-info-text" th:text="${enseignant.specialite}">Informatique</div>
+                <div class="stat-label">Spécialité</div>
+            </div>
+
+        </div>
+
+        <!-- ===== SÉANCES DU JOUR ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Séances d'aujourd'hui</h3>
+                <a th:href="@{/enseignant/seances/{id}(id=${enseignant.id})}" class="btn btn-outline btn-sm">
+                    Voir toutes les séances
+                </a>
+            </div>
+
+            <div class="empty-msg" th:if="${seancesAujourdhui.isEmpty()}">
+                <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+                Aucune séance aujourd'hui
+            </div>
+
+            <div th:unless="${seancesAujourdhui.isEmpty()}">
+                <div class="seance-item" th:each="seance : ${seancesAujourdhui}">
+                    <div style="flex:1;">
+                        <div class="seance-module" th:text="${seance.moduleIntitule}">Algorithmique</div>
+                        <div class="seance-detail">
+                            <i class="fas fa-clock me-1"></i>
+                            <span th:text="${seance.heureDebut + ' — ' + seance.heureFin}">08h00–10h00</span>
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-door-open me-1"></i>
+                            <span th:text="${'Salle ' + seance.salleNumero}">Salle 202</span>
+                        </div>
+                        <div class="seance-type">
+                            <span class="badge badge-type" th:text="${seance.typeSeance}">CM</span>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <a th:href="@{/enseignant/seance/{sid}/appel/{eid}(sid=${seance.id},eid=${enseignant.id})}"
+                           class="btn btn-outline btn-sm">
+                            <i class="fas fa-list-check me-1"></i>Appel
+                        </a>
+                        <a th:href="@{/enseignant/seance/{sid}/pointage/{eid}(sid=${seance.id},eid=${enseignant.id})}"
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-pen me-1"></i>Pointage
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== SÉANCES DE LA SEMAINE ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Planning de la semaine</h3>
+            </div>
+
+            <div class="empty-msg" th:if="${seancesSemaine.isEmpty()}">
+                Aucune séance cette semaine
+            </div>
+
+            <div class="table-responsive" th:unless="${seancesSemaine.isEmpty()}">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Module</th>
+                        <th>Type</th>
+                        <th>Horaire</th>
+                        <th>Salle</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${seancesSemaine}">
+                        <td th:text="${s.dateSeance}">19/04/2026</td>
+                        <td th:text="${s.moduleIntitule}">Algorithmique</td>
+                        <td>
+                            <span class="badge badge-type" th:text="${s.typeSeance}">CM</span>
+                        </td>
+                        <td th:text="${s.heureDebut + ' — ' + s.heureFin}">08h00–10h00</td>
+                        <td th:text="${s.salleNumero}">202</td>
+                        <td>
+                            <a th:href="@{/enseignant/seance/{sid}/appel/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                               class="btn btn-outline btn-sm me-1">Appel</a>
+                            <a th:href="@{/enseignant/seance/{sid}/pointage/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                               class="btn btn-primary btn-sm">Pointage</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/dashboard-enseignant.js"></script>
+</body>
+</html>
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Enseignant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { &#45;&#45;couleur: #4e342e; &#45;&#45;couleur-light: #efebe9; }
+        body { background:#f5f0ee; margin:0; }
+        .sidebar { background:var(&#45;&#45;couleur); min-height:100vh; width:240px; position:fixed; top:0; left:0; z-index:100; }
+        .sidebar-brand { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.15); }
+        .sidebar-brand h6 { color:#fff; font-weight:600; margin:0; font-size:1rem; }
+        .sidebar-brand small { color:rgba(255,255,255,0.65); font-size:0.75rem; }
+        .sidebar .nav-link { color:rgba(255,255,255,0.8); padding:11px 20px; font-size:0.9rem; display:flex; align-items:center; gap:10px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background:rgba(255,255,255,0.18); color:#fff; }
+        .sidebar .nav-link i { width:18px; text-align:center; }
+        .main { margin-left:240px; padding:30px; min-height:100vh; }
+        .topbar { background:#fff; border-radius:12px; padding:16px 24px; margin-bottom:24px; box-shadow:0 1px 6px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; }
+        .stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 6px rgba(0,0,0,0.06); border-top:4px solid var(&#45;&#45;couleur); }
+        .stat-card .val { font-size:2rem; font-weight:600; color:var(&#45;&#45;couleur); }
+        .stat-card .lbl { font-size:0.8rem; color:#888; margin-top:2px; }
+        .card-section { background:#fff; border-radius:12px; box-shadow:0 1px 6px rgba(0,0,0,0.06); margin-bottom:20px; }
+        .card-section .card-header { background:#fff; border-bottom:1px solid #ece8e6; padding:16px 20px; border-radius:12px 12px 0 0; }
+        .card-section .card-header h6 { margin:0; font-weight:600; color:#333; }
+        .card-section .card-body { padding:16px 20px; }
+        .seance-item { border-left:4px solid var(&#45;&#45;couleur); background:var(&#45;&#45;couleur-light); border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:10px; }
+        .btn-action { background:var(&#45;&#45;couleur); border:none; color:#fff; padding:6px 14px; border-radius:6px; font-size:0.82rem; text-decoration:none; display:inline-block; }
+        .btn-action:hover { background:#3e2723; color:#fff; }
+        .btn-action-outline { border:1px solid var(&#45;&#45;couleur); color:var(&#45;&#45;couleur); background:transparent; padding:6px 14px; border-radius:6px; font-size:0.82rem; text-decoration:none; display:inline-block; }
+        .btn-action-outline:hover { background:var(&#45;&#45;couleur); color:#fff; }
+        .sidebar-divider { border-color:rgba(255,255,255,0.15); margin:8px 16px; }
+        .badge-type { background:var(&#45;&#45;couleur); color:#fff; font-size:0.7rem; padding:3px 8px; border-radius:20px; }
+    </style>
+</head>
+<body>
+
+&lt;!&ndash; Sidebar &ndash;&gt;
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <h6><i class="fas fa-chalkboard-teacher me-2"></i>FST Présence</h6>
+        <small th:text="${enseignant.prenom + ' ' + enseignant.nom}"></small>
+    </div>
+    <nav class="nav flex-column mt-2">
+        <a class="nav-link active" th:href="@{/enseignant/dashboard/{id}(id=${enseignant.id})}">
+            <i class="fas fa-home"></i> Tableau de bord
+        </a>
+        <a class="nav-link" th:href="@{/enseignant/seances/{id}(id=${enseignant.id})}">
+            <i class="fas fa-calendar"></i> Mes séances
+        </a>
+        <hr class="sidebar-divider">
+        <a class="nav-link" href="/login">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </nav>
+</div>
+
+&lt;!&ndash; Contenu principal &ndash;&gt;
+<div class="main">
+
+    &lt;!&ndash; Topbar &ndash;&gt;
+    <div class="topbar">
+        <div>
+            <h5 class="mb-0">Bonjour, <span th:text="${enseignant.prenom}"></span> 👋</h5>
+            <small class="text-muted">
+                <span th:text="${enseignant.grade}"></span> &nbsp;·&nbsp;
+                <span th:text="${enseignant.specialite}"></span>
+            </small>
+        </div>
+        <span class="badge" style="background:var(&#45;&#45;couleur);font-size:0.8rem;padding:6px 12px;border-radius:20px;color:#fff">
+            <i class="fas fa-calendar me-1"></i>
+            <span th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy')}"></span>
+        </span>
+    </div>
+
+    &lt;!&ndash; Stats &ndash;&gt;
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="val" th:text="${nbSeancesAujourdhui}">0</div>
+                <div class="lbl"><i class="fas fa-calendar-day me-1"></i>Séances aujourd'hui</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="val" th:text="${nbSeancesSemaine}">0</div>
+                <div class="lbl"><i class="fas fa-calendar-week me-1"></i>Séances cette semaine</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="val">—</div>
+                <div class="lbl"><i class="fas fa-clock me-1"></i>Pointages en attente</div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Séances du jour &ndash;&gt;
+    <div class="card-section mb-4">
+        <div class="card-header">
+            <h6><i class="fas fa-calendar-day me-2" style="color:var(&#45;&#45;couleur)"></i>Séances d'aujourd'hui</h6>
+        </div>
+        <div class="card-body">
+            <div th:if="${seancesAujourdhui.isEmpty()}" class="text-center text-muted py-4">
+                <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                Aucune séance aujourd'hui
+            </div>
+            <div th:each="s : ${seancesAujourdhui}" class="seance-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong th:text="${s.moduleIntitule}"></strong>
+                        <span class="badge-type ms-2" th:text="${s.typeSeance}"></span>
+                        <br>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            <span th:text="${s.heureDebut + ' — ' + s.heureFin}"></span>
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-door-open me-1"></i>Salle
+                            <span th:text="${s.salleNumero}"></span>
+                        </small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/enseignant/seance/{sid}/appel/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                           class="btn-action-outline">
+                            <i class="fas fa-list-check me-1"></i>Appel
+                        </a>
+                        <a th:href="@{/enseignant/seance/{sid}/pointage/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                           class="btn-action">
+                            <i class="fas fa-pen me-1"></i>Pointage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Séances de la semaine &ndash;&gt;
+    <div class="card-section">
+        <div class="card-header">
+            <h6><i class="fas fa-calendar-week me-2" style="color:var(&#45;&#45;couleur)"></i>Planning de la semaine</h6>
+        </div>
+        <div class="card-body">
+            <div th:if="${seancesSemaine.isEmpty()}" class="text-center text-muted py-4">
+                <p>Aucune séance cette semaine</p>
+            </div>
+            <div class="table-responsive" th:if="${!seancesSemaine.isEmpty()}">
+                <table class="table table-hover align-middle">
+                    <thead style="background:#efebe9">
+                    <tr>
+                        <th>Date</th><th>Module</th><th>Type</th>
+                        <th>Horaire</th><th>Salle</th><th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${seancesSemaine}">
+                        <td th:text="${s.dateSeance}"></td>
+                        <td th:text="${s.moduleIntitule}"></td>
+                        <td><span class="badge-type" th:text="${s.typeSeance}"></span></td>
+                        <td th:text="${s.heureDebut + ' — ' + s.heureFin}"></td>
+                        <td th:text="${s.salleNumero}"></td>
+                        <td>
+                            <a th:href="@{/enseignant/seance/{sid}/appel/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                               class="btn-action-outline me-1">Appel</a>
+                            <a th:href="@{/enseignant/seance/{sid}/pointage/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                               class="btn-action">Pointage</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+&lt;!&ndash;
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Enseignant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background:#f4f6f9; }
+        .sidebar { background:#1a237e; min-height:100vh; padding:0; }
+        .sidebar .nav-link { color:rgba(255,255,255,0.8); padding:12px 20px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background:rgba(255,255,255,0.15); color:#fff; }
+        .sidebar-brand { padding:20px; color:#fff; font-size:1.1rem; font-weight:700; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .stat-card { border-radius:12px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+        .main-content { padding:30px; }
+        .seance-card { border-left:4px solid #1a237e; border-radius:8px; margin-bottom:12px; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        &lt;!&ndash; Sidebar &ndash;&gt;
+        <div class="col-md-2 sidebar p-0">
+            <div class="sidebar-brand">
+                <i class="fas fa-chalkboard-teacher me-2"></i>FST Présence
+            </div>
+            <nav class="nav flex-column mt-2">
+                <a class="nav-link active" th:href="@{/enseignant/dashboard/{id}(id=${enseignant.id})}">
+                    <i class="fas fa-home me-2"></i>Tableau de bord
+                </a>
+                <a class="nav-link" th:href="@{/enseignant/seances/{id}(id=${enseignant.id})}">
+                    <i class="fas fa-calendar me-2"></i>Mes séances
+                </a>
+                <hr style="border-color:rgba(255,255,255,0.2)">
+                <a class="nav-link" href="/login">
+                    <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                </a>
+            </nav>
+        </div>
+
+        &lt;!&ndash; Contenu principal &ndash;&gt;
+        <div class="col-md-10 main-content">
+            &lt;!&ndash; En-tête &ndash;&gt;
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-0">Bonjour, <span th:text="${enseignant.prenom + ' ' + enseignant.nom}"></span> 👋</h4>
+                    <small class="text-muted" th:text="${enseignant.grade + ' — ' + enseignant.specialite}"></small>
+                </div>
+                <span class="badge bg-primary fs-6" th:text="${#temporals.format(#dates.createNow(), 'EEEE dd MMMM yyyy')}"></span>
+            </div>
+
+            &lt;!&ndash; Statistiques &ndash;&gt;
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card stat-card p-3 text-center">
+                        <div class="fs-1 text-primary fw-bold" th:text="${nbSeancesAujourdhui}">0</div>
+                        <div class="text-muted">Séances aujourd'hui</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card p-3 text-center">
+                        <div class="fs-1 text-success fw-bold" th:text="${nbSeancesSemaine}">0</div>
+                        <div class="text-muted">Séances cette semaine</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card p-3 text-center">
+                        <div class="fs-1 text-warning fw-bold">—</div>
+                        <div class="text-muted">Pointages en attente</div>
+                    </div>
+                </div>
+            </div>
+
+            &lt;!&ndash; Séances du jour &ndash;&gt;
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h5><i class="fas fa-calendar-day text-primary me-2"></i>Séances d'aujourd'hui</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${seancesAujourdhui.isEmpty()}" class="text-center text-muted py-4">
+                        <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                        <p>Aucune séance aujourd'hui</p>
+                    </div>
+                    <div th:each="seance : ${seancesAujourdhui}" class="card seance-card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong th:text="${seance.moduleIntitule}"></strong>
+                                <span class="badge bg-light text-dark ms-2" th:text="${seance.typeSeance}"></span>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <span th:text="${seance.heureDebut + ' — ' + seance.heureFin}"></span>
+                                    &nbsp;|&nbsp;
+                                    <i class="fas fa-door-open me-1"></i>
+                                    Salle <span th:text="${seance.salleNumero}"></span>
+                                </small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/enseignant/seance/{sid}/appel/{eid}(sid=${seance.id},eid=${enseignant.id})}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-list-check me-1"></i>Faire l'appel
+                                </a>
+                                <a th:href="@{/enseignant/seance/{sid}/pointage/{eid}(sid=${seance.id},eid=${enseignant.id})}"
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-pen me-1"></i>Pointage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            &lt;!&ndash; Séances de la semaine &ndash;&gt;
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h5><i class="fas fa-calendar-week text-success me-2"></i>Cette semaine</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${seancesSemaine.isEmpty()}" class="text-center text-muted py-4">
+                        <p>Aucune séance cette semaine</p>
+                    </div>
+                    <div class="table-responsive" th:if="${!seancesSemaine.isEmpty()}">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Date</th><th>Module</th><th>Type</th>
+                                <th>Horaire</th><th>Salle</th><th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="s : ${seancesSemaine}">
+                                <td th:text="${s.dateSeance}"></td>
+                                <td th:text="${s.moduleIntitule}"></td>
+                                <td><span class="badge bg-secondary" th:text="${s.typeSeance}"></span></td>
+                                <td th:text="${s.heureDebut + ' — ' + s.heureFin}"></td>
+                                <td th:text="${s.salleNumero}"></td>
+                                <td>
+                                    <a th:href="@{/enseignant/seance/{sid}/appel/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                                       class="btn btn-sm btn-outline-primary me-1">Appel</a>
+                                    <a th:href="@{/enseignant/seance/{sid}/pointage/{eid}(sid=${s.id},eid=${enseignant.id})}"
+                                       class="btn btn-sm btn-primary">Pointage</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+&lt;!&ndash;
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Enseignant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-success">Dashboard Enseignant</h2>
+            <p class="mb-0">
+                Bienvenue,
+                <strong th:text="${dashboard.nomComplet}">Nom Enseignant</strong>
+            </p>
+        </div>
+        <div>
+            <a th:href="@{/}" class="btn btn-outline-secondary">Accueil</a>
+        </div>
+    </div>
+
+    &lt;!&ndash; Informations profil &ndash;&gt;
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white">
+            Informations de l'enseignant
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"><strong>Email :</strong> <span th:text="${dashboard.email}"></span></div>
+                <div class="col-md-3"><strong>Grade :</strong> <span th:text="${dashboard.grade}"></span></div>
+                <div class="col-md-3"><strong>Spécialité :</strong> <span th:text="${dashboard.specialite}"></span></div>
+                <div class="col-md-2"><strong>Département :</strong> <span th:text="${dashboard.departement}"></span></div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Cartes statistiques &ndash;&gt;
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <h5>Total séances</h5>
+                    <h2 class="text-success" th:text="${dashboard.totalSeances}">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <h5>Séances du jour</h5>
+                    <h2 class="text-primary" th:text="${dashboard.seancesAujourdHui}">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <h5>Modules</h5>
+                    <h2 class="text-warning" th:text="${dashboard.totalModules}">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <h5>Pointages récents</h5>
+                    <h2 class="text-danger" th:text="${dashboard.totalPointages}">0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        &lt;!&ndash; Séances du jour &ndash;&gt;
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">Séances du jour</div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Module</th>
+                            <th>Salle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="seance : ${dashboard.prochainesSeances}">
+                            <td th:text="${seance.dateSeance}"></td>
+                            <td th:text="${seance.moduleCours != null ? seance.moduleCours.intitule : 'N/A'}"></td>
+                            <td th:text="${seance.salle != null ? seance.salle.numero : 'N/A'}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(dashboard.prochainesSeances)}">
+                            <td colspan="3" class="text-center">Aucune séance aujourd’hui</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        &lt;!&ndash; Séances récentes &ndash;&gt;
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">Séances récentes</div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Module</th>
+                            <th>Salle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="seance : ${dashboard.seancesRecentes}">
+                            <td th:text="${seance.dateSeance}"></td>
+                            <td th:text="${seance.moduleCours != null ? seance.moduleCours.intitule : 'N/A'}"></td>
+                            <td th:text="${seance.salle != null ? seance.salle.numero : 'N/A'}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(dashboard.seancesRecentes)}">
+                            <td colspan="3" class="text-center">Aucune séance récente</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Pointages récents &ndash;&gt;
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">Historique récent des pointages</div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Date pointage</th>
+                    <th>Statut</th>
+                    <th>Séance</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pointage : ${dashboard.pointagesRecents}">
+                    <td th:text="${pointage.datePointage}"></td>
+                    <td th:text="${pointage.statut}"></td>
+                    <td th:text="${pointage.seance != null ? pointage.seance.id : 'N/A'}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(dashboard.pointagesRecents)}">
+                    <td colspan="3" class="text-center">Aucun pointage récent</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+&ndash;&gt;
+&ndash;&gt;
+-->

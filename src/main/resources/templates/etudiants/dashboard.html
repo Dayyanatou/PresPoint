@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="'Tableau de bord — ' + ${etudiant.prenom}">Tableau de bord</title>
+    <link href="/css/dashboard-etudiant-ambre.css" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Espace Étudiant — FST</div>
+    </div>
+
+    <div class="user-block">
+        <div class="avatar">
+            <span th:text="${#strings.substring(etudiant.prenom,0,1) + #strings.substring(etudiant.nom,0,1)}">AS</span>
+        </div>
+        <div>
+            <div class="u-name" th:text="${etudiant.prenom + ' ' + etudiant.nom}">Aïcha Salami</div>
+            <div class="u-info" th:text="${etudiant.matricule}">2204033</div>
+        </div>
+    </div>
+
+    <div class="nav-section">Mon espace</div>
+
+    <a th:href="@{/etudiant/dashboard/{id}(id=${etudiant.id})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Tableau de bord
+    </a>
+
+    <a th:href="@{/etudiant/{id}/presences(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Mes présences
+    </a>
+
+    <a th:href="@{/etudiant/{id}/emploi-du-temps(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Emploi du temps
+    </a>
+
+    <a th:href="@{/etudiant/{id}/justificatifs(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Justificatifs
+    </a>
+
+    <a th:href="@{/etudiant/{id}/statistiques(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Statistiques
+    </a>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<div class="main-content">
+
+    <div class="topbar">
+        <h1>Tableau de bord</h1>
+        <span class="date-badge" th:text="${#dates.format(#dates.createNow(), 'EEEE dd MMMM yyyy')}">
+            Lundi 21 avril 2026
+        </span>
+    </div>
+
+    <div class="page-content">
+
+        <!-- ===== ALERTE SEUIL ===== -->
+        <div class="alert-warning" th:if="${sousSeuil}">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div>
+                <strong>Attention !</strong>
+                Votre taux de présence global est de
+                <strong th:text="${tauxGlobal + '%'}">81%</strong>
+                — en dessous du seuil requis de 75%. Veuillez régulariser vos absences.
+            </div>
+        </div>
+
+        <!-- ===== CARTES STATISTIQUES ===== -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <svg fill="none" stroke="#155724" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-value-green" th:text="${presences != null ? presences.size() : 0}">42</div>
+                <div class="stat-label">Enregistrements de présence</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-red">
+                    <svg fill="none" stroke="#721c24" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-value-red" th:text="${absencesNonJustifiees}">7</div>
+                <div class="stat-label">Absences non justifiées</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-primary">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-value-primary" th:text="${tauxGlobal + '%'}">81%</div>
+                <div class="stat-label">Taux global (seuil : 75%)</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-info">
+                    <svg fill="none" stroke="#004085" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+                    </svg>
+                </div>
+                <div class="stat-value stat-info-text" style="font-size:16px;padding-top:6px;"
+                     th:text="${etudiant.departementNom}">Informatique</div>
+                <div class="stat-label" th:text="${etudiant.niveau}">Bachelor 4</div>
+            </div>
+
+        </div>
+
+        <div class="two-col">
+
+            <!-- ===== SÉANCES DU JOUR ===== -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Séances d'aujourd'hui</h3>
+                    <a th:href="@{/etudiant/{id}/emploi-du-temps(id=${etudiant.id})}"
+                       class="btn btn-outline btn-sm">Voir tout</a>
+                </div>
+
+                <div class="empty-msg" th:if="${#lists.isEmpty(seancesAujourdhui)}">
+                    Aucune séance prévue aujourd'hui.
+                </div>
+
+                <div th:unless="${#lists.isEmpty(seancesAujourdhui)}">
+                    <div class="seance-item" th:each="seance : ${seancesAujourdhui}">
+                        <div class="seance-dot"></div>
+                        <span class="seance-time" th:text="${seance.heureDebut + ' – ' + seance.heureFin}">
+                            08h00 – 10h00
+                        </span>
+                        <div>
+                            <div class="seance-module" th:text="${seance.moduleIntitule}">Algorithmique</div>
+                            <div class="seance-detail"
+                                 th:text="${'Salle ' + seance.salleNumero + ' · ' + seance.enseignantNom}">
+                                Salle 4 · M. Dilwani
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== TAUX PAR MODULE ===== -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Taux de présence par module</h3>
+                </div>
+
+                <div class="empty-msg" th:if="${tauxParModule == null or tauxParModule.isEmpty()}">
+                    Aucun module enregistré.
+                </div>
+
+                <div th:unless="${tauxParModule == null or tauxParModule.isEmpty()}">
+                    <div class="progress-row" th:each="entry : ${tauxParModule}">
+                        <span class="prog-label" th:text="${entry.key}">Algorithmique</span>
+
+                        <div class="prog-bg">
+                            <div class="prog-fill"
+                                 th:style="'width:' + ${entry.value} + '%;background:' +
+                             (${entry.value >= 75} ? '#27ae60' :
+                             (${entry.value >= 60} ? '#f39c12' : '#e74c3c'))">
+                            </div>
+                        </div>
+
+                        <span class="prog-pct"
+                              th:style="'color:' + (${entry.value >= 75} ? '#155724' :
+                             (${entry.value >= 60} ? '#856404' : '#721c24'))"
+                              th:text="${entry.value + '%'}">92%</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="/js/dashboard-etudiant.js"></script>
+</body>
+</html>
+
+<!--
+&lt;!&ndash;
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Étudiant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { &#45;&#45;couleur: #c47c00; &#45;&#45;couleur-light: #fff8e1; }
+        body { background:#f8f5f0; margin:0; }
+        .sidebar { background:var(&#45;&#45;couleur); min-height:100vh; width:240px; position:fixed; top:0; left:0; z-index:100; }
+        .sidebar-brand { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.15); }
+        .sidebar-brand h6 { color:#fff; font-weight:600; margin:0; font-size:1rem; }
+        .sidebar-brand small { color:rgba(255,255,255,0.65); font-size:0.75rem; }
+        .sidebar .nav-link { color:rgba(255,255,255,0.8); padding:11px 20px; border-radius:0; font-size:0.9rem; display:flex; align-items:center; gap:10px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background:rgba(255,255,255,0.18); color:#fff; }
+        .sidebar .nav-link i { width:18px; text-align:center; }
+        .main { margin-left:240px; padding:30px; min-height:100vh; }
+        .topbar { background:#fff; border-radius:12px; padding:16px 24px; margin-bottom:24px; box-shadow:0 1px 6px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; }
+        .stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 6px rgba(0,0,0,0.06); border-top:4px solid var(&#45;&#45;couleur); }
+        .stat-card .val { font-size:2rem; font-weight:600; color:var(&#45;&#45;couleur); }
+        .stat-card .lbl { font-size:0.8rem; color:#888; margin-top:2px; }
+        .card-section { background:#fff; border-radius:12px; box-shadow:0 1px 6px rgba(0,0,0,0.06); margin-bottom:20px; }
+        .card-section .card-header { background:#fff; border-bottom:1px solid #f0ebe3; padding:16px 20px; border-radius:12px 12px 0 0; }
+        .card-section .card-header h6 { margin:0; font-weight:600; color:#333; }
+        .card-section .card-body { padding:16px 20px; }
+        .seance-item { border-left:4px solid var(&#45;&#45;couleur); background:var(&#45;&#45;couleur-light); border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:10px; }
+        .badge-type { background:var(&#45;&#45;couleur); color:#fff; font-size:0.7rem; padding:3px 8px; border-radius:20px; }
+        .progress-bar { background:var(&#45;&#45;couleur) !important; }
+        .btn-primary-custom { background:var(&#45;&#45;couleur); border:none; color:#fff; padding:6px 14px; border-radius:6px; font-size:0.85rem; }
+        .btn-primary-custom:hover { background:#a06800; color:#fff; }
+        .sidebar-divider { border-color:rgba(255,255,255,0.15); margin:8px 16px; }
+    </style>
+</head>
+<body>
+
+&lt;!&ndash; Sidebar &ndash;&gt;
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <h6><i class="fas fa-graduation-cap me-2"></i>FST Présence</h6>
+        <small th:text="${etudiant.prenom + ' ' + etudiant.nom}"></small>
+    </div>
+    <nav class="nav flex-column mt-2">
+        <a class="nav-link active" th:href="@{/etudiant/dashboard/{id}(id=${etudiant.id})}">
+            <i class="fas fa-home"></i> Tableau de bord
+        </a>
+        <a class="nav-link" th:href="@{/etudiant/{id}/presences(id=${etudiant.id})}">
+            <i class="fas fa-calendar-check"></i> Mes présences
+        </a>
+        <a class="nav-link" th:href="@{/etudiant/{id}/emploi-du-temps(id=${etudiant.id})}">
+            <i class="fas fa-calendar-week"></i> Emploi du temps
+        </a>
+        <a class="nav-link" th:href="@{/etudiant/{id}/statistiques(id=${etudiant.id})}">
+            <i class="fas fa-chart-pie"></i> Statistiques
+        </a>
+        <a class="nav-link" th:href="@{/etudiant/{id}/justificatifs(id=${etudiant.id})}">
+            <i class="fas fa-file-alt"></i> Justificatifs
+        </a>
+        <hr class="sidebar-divider">
+        <a class="nav-link" href="/login">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </nav>
+</div>
+
+&lt;!&ndash; Contenu principal &ndash;&gt;
+<div class="main">
+
+    &lt;!&ndash; Topbar &ndash;&gt;
+    <div class="topbar">
+        <div>
+            <h5 class="mb-0">Bonjour, <span th:text="${etudiant.prenom}"></span> 👋</h5>
+            <small class="text-muted">
+                Matricule : <strong th:text="${etudiant.matricule}"></strong> &nbsp;|&nbsp;
+                Niveau : <strong th:text="${etudiant.niveau}"></strong> &nbsp;|&nbsp;
+                <span th:text="${etudiant.departementNom}"></span>
+            </small>
+        </div>
+        <div class="text-end">
+            <span class="badge" style="background:var(&#45;&#45;couleur);font-size:0.8rem;padding:6px 12px;border-radius:20px;">
+                <i class="fas fa-calendar me-1"></i>
+                <span th:text="${#temporals.format(#dates.createNow(), 'dd MMM yyyy')}"></span>
+            </span>
+        </div>
+    </div>
+
+    &lt;!&ndash; Stats &ndash;&gt;
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="val" th:text="${totalPresences}">0</div>
+                <div class="lbl"><i class="fas fa-check-circle me-1"></i>Total présences</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="val text-danger" th:text="${totalAbsences}">0</div>
+                <div class="lbl"><i class="fas fa-times-circle me-1"></i>Absences</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="val text-warning" th:text="${absencesNonJustifiees}">0</div>
+                <div class="lbl"><i class="fas fa-exclamation-circle me-1"></i>Non justifiées</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="val" th:text="${tauxPresence != null ? #numbers.formatDecimal(tauxPresence, 1, 1) + '%' : '—'}">—</div>
+                <div class="lbl"><i class="fas fa-percent me-1"></i>Taux de présence</div>
+            </div>
+        </div>
+    </div>
+
+    &lt;!&ndash; Taux de présence &ndash;&gt;
+    <div class="card-section mb-4" th:if="${tauxPresence != null}">
+        <div class="card-header">
+            <h6><i class="fas fa-chart-line me-2" style="color:var(&#45;&#45;couleur)"></i>Taux de présence global</h6>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted small">Progression</span>
+                <span class="fw-bold" style="color:var(&#45;&#45;couleur)" th:text="${#numbers.formatDecimal(tauxPresence, 1, 1) + '%'}"></span>
+            </div>
+            <div class="progress" style="height:10px;border-radius:10px;">
+                <div class="progress-bar" role="progressbar"
+                     th:style="'width:' + ${tauxPresence} + '%'"
+                     th:attr="aria-valuenow=${tauxPresence}"
+                     aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <small class="text-muted mt-1 d-block">Seuil minimum requis : 75%</small>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        &lt;!&ndash; Séances aujourd'hui &ndash;&gt;
+        <div class="col-md-6">
+            <div class="card-section">
+                <div class="card-header">
+                    <h6><i class="fas fa-calendar-day me-2" style="color:var(&#45;&#45;couleur)"></i>Séances d'aujourd'hui</h6>
+                </div>
+                <div class="card-body">
+                    <div th:if="${seancesAujourdhui == null or seancesAujourdhui.isEmpty()}"
+                         class="text-center text-muted py-3">
+                        <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                        Aucune séance aujourd'hui
+                    </div>
+                    <div th:each="s : ${seancesAujourdhui}" class="seance-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong th:text="${s.moduleIntitule}"></strong>
+                                <span class="badge-type ms-2" th:text="${s.typeSeance}"></span>
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            <i class="fas fa-clock me-1"></i>
+                            <span th:text="${s.heureDebut + ' — ' + s.heureFin}"></span>
+                            &nbsp;·&nbsp;
+                            <i class="fas fa-door-open me-1"></i>Salle
+                            <span th:text="${s.salleNumero}"></span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        &lt;!&ndash; Dernières présences &ndash;&gt;
+        <div class="col-md-6">
+            <div class="card-section">
+                <div class="card-header d-flex justify-content-between">
+                    <h6 class="mb-0"><i class="fas fa-history me-2" style="color:var(&#45;&#45;couleur)"></i>Dernières présences</h6>
+                    <a th:href="@{/etudiant/{id}/presences(id=${etudiant.id})}"
+                       class="btn-primary-custom text-decoration-none" style="font-size:0.78rem;">Voir tout</a>
+                </div>
+                <div class="card-body">
+                    <div th:if="${dernieresPresences == null or dernieresPresences.isEmpty()}"
+                         class="text-center text-muted py-3">
+                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                        Aucune présence enregistrée
+                    </div>
+                    <div th:each="p : ${dernieresPresences}" class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <small class="fw-semibold" th:text="${p.seanceIntitule}">Module</small><br>
+                            <small class="text-muted" th:text="${p.datePresence}"></small>
+                        </div>
+                        <span th:if="${p.statut.name() == 'PRESENT'}" class="badge bg-success">Présent</span>
+                        <span th:if="${p.statut.name() == 'ABSENT'}" class="badge bg-danger">Absent</span>
+                        <span th:if="${p.statut.name() == 'JUSTIFIE'}" class="badge bg-warning text-dark">Justifié</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+&ndash;&gt;
+
+<!DOCTYPE html>
+&lt;!&ndash; Thymeleaf : obligatoire pour activer th:text, th:each, th:if... &ndash;&gt;
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    &lt;!&ndash; th:text remplace le contenu entre les balises par la variable &ndash;&gt;
+    &lt;!&ndash; ${etudiant.prenom} = le prénom envoyé par le Controller via model.addAttribute &ndash;&gt;
+    <title th:text="'Tableau de bord — ' + ${etudiant.prenom}">Tableau de bord</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #f0f2f5;
+          color: #1a1a2e;
+          min-height: 100vh;
+          display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+          width: 220px; min-height: 100vh;
+          background: #1a237e;
+          display: flex; flex-direction: column;
+          position: fixed; top: 0; left: 0;
+        }
+        .sidebar-top { padding: 1.5rem 1rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .app-logo { font-size: 18px; font-weight: 700; color: #fff; }
+        .app-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+        .user-block {
+          padding: 1rem; display: flex; align-items: center; gap: 10px;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar {
+          width: 40px; height: 40px; border-radius: 50%;
+          background: rgba(255,255,255,0.2);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .u-name { font-size: 13px; font-weight: 600; color: #fff; }
+        .u-info { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+        .nav-section {
+          font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3);
+          letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 1rem 4px;
+        }
+        .nav-item {
+          display: flex; align-items: center; gap: 10px; padding: 10px 1rem;
+          font-size: 13px; color: rgba(255,255,255,0.7);
+          text-decoration: none; transition: background 0.15s, color 0.15s;
+        }
+        .nav-item:hover  { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-item.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
+        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .sidebar-spacer { flex: 1; }
+        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* ===== MAIN ===== */
+        .main-content { margin-left: 220px; flex: 1; }
+        .topbar {
+          background: #fff; border-bottom: 1px solid #e8ecf0;
+          padding: 14px 1.5rem; display: flex; align-items: center; justify-content: space-between;
+          position: sticky; top: 0; z-index: 50;
+        }
+        .topbar h1 { font-size: 16px; font-weight: 600; }
+        .date-badge {
+          font-size: 12px; color: #7f8c8d;
+          background: #f0f2f5; padding: 5px 12px; border-radius: 20px;
+        }
+        .page-content { padding: 1.5rem; }
+
+        /* ===== ALERTE SEUIL ===== */
+        /* th:if : affiché seulement si sousSeuil = true */
+        .alert-warning {
+          background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px;
+          padding: 14px 1.25rem; margin-bottom: 1.5rem;
+          font-size: 13px; color: #856404; display: flex; gap: 10px;
+        }
+
+        /* ===== STAT CARDS ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 1.5rem; }
+        .stat-card {
+          background: #fff; border-radius: 12px; border: 1px solid #e8ecf0; padding: 1.25rem;
+        }
+        .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .stat-icon svg { width: 20px; height: 20px; }
+        .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 12px; color: #7f8c8d; margin-top: 2px; }
+
+        /* ===== CARDS ===== */
+        .card { background: #fff; border-radius: 12px; border: 1px solid #e8ecf0; margin-bottom: 1.25rem; overflow: hidden; }
+        .card-header { padding: 14px 1.25rem; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; justify-content: space-between; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+        /* ===== TABLEAUX ===== */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th { font-size: 11px; font-weight: 600; color: #7f8c8d; text-align: left; padding: 10px 1.25rem; border-bottom: 1px solid #e8ecf0; background: #f8f9fa; }
+        tbody td { padding: 11px 1.25rem; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #f8f9fa; }
+        .empty-msg { padding: 2rem; text-align: center; color: #7f8c8d; font-size: 13px; }
+
+        /* ===== BADGES ===== */
+        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-green  { background: #d4edda; color: #155724; }
+        .badge-red    { background: #f8d7da; color: #721c24; }
+        .badge-amber  { background: #fff3cd; color: #856404; }
+
+        /* ===== PROGRESS ===== */
+        .progress-row { display: flex; align-items: center; gap: 12px; padding: 10px 1.25rem; border-bottom: 1px solid #f0f0f0; }
+        .progress-row:last-child { border-bottom: none; }
+        .prog-label { font-size: 13px; min-width: 140px; }
+        .prog-bg { flex: 1; height: 7px; background: #e8ecf0; border-radius: 4px; overflow: hidden; }
+        .prog-fill { height: 100%; border-radius: 4px; }
+        .prog-pct { font-size: 12px; font-weight: 600; min-width: 40px; text-align: right; }
+
+        /* ===== SÉANCES ===== */
+        .seance-item { display: flex; align-items: center; gap: 14px; padding: 12px 1.25rem; border-bottom: 1px solid #f0f0f0; }
+        .seance-item:last-child { border-bottom: none; }
+        .seance-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a237e; flex-shrink: 0; }
+        .seance-time { font-size: 12px; color: #7f8c8d; min-width: 120px; }
+        .seance-module { font-size: 13px; font-weight: 600; }
+        .seance-detail { font-size: 11px; color: #7f8c8d; margin-top: 2px; }
+
+        /* ===== BOUTONS ===== */
+        .btn { padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #1a237e; color: #fff; }
+        .btn-outline { background: #fff; color: #1a1a2e; border: 1px solid #d0d7de; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+&lt;!&ndash; ===== SIDEBAR ===== &ndash;&gt;
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Espace Étudiant — FST</div>
+    </div>
+
+    &lt;!&ndash; th:text : affiche le prénom et nom réels de l'étudiant connecté &ndash;&gt;
+    <div class="user-block">
+        <div class="avatar">
+            &lt;!&ndash; Initiales : première lettre du prénom + première lettre du nom &ndash;&gt;
+            &lt;!&ndash; ${#strings.substring(etudiant.prenom,0,1)} = première lettre du prénom &ndash;&gt;
+            <span th:text="${#strings.substring(etudiant.prenom,0,1) + #strings.substring(etudiant.nom,0,1)}">AS</span>
+        </div>
+        <div>
+            &lt;!&ndash; Concatène prénom + espace + nom &ndash;&gt;
+            <div class="u-name" th:text="${etudiant.prenom + ' ' + etudiant.nom}">Aïcha Salami</div>
+            <div class="u-info" th:text="${etudiant.matricule}">2204033</div>
+        </div>
+    </div>
+
+    <div class="nav-section">Mon espace</div>
+
+    &lt;!&ndash; th:href : génère l'URL avec l'ID de l'étudiant dynamiquement &ndash;&gt;
+    &lt;!&ndash; @{/etudiant/dashboard/{id}(id=${etudiant.id})} = /etudiant/dashboard/1 &ndash;&gt;
+    <a th:href="@{/etudiant/dashboard/{id}(id=${etudiant.id})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Tableau de bord
+    </a>
+
+    <a th:href="@{/etudiant/{id}/presences(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Mes présences
+    </a>
+
+    <a th:href="@{/etudiant/{id}/emploi-du-temps(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Emploi du temps
+    </a>
+
+    &lt;!&ndash; Ajouter ce bloc après le lien Emploi du temps &ndash;&gt;
+    <a th:href="@{/etudiant/{id}/justificatifs(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Justificatifs
+    </a>
+
+
+    <a th:href="@{/etudiant/{id}/statistiques(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Statistiques
+    </a>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+&lt;!&ndash; ===== CONTENU PRINCIPAL ===== &ndash;&gt;
+<div class="main-content">
+
+    <div class="topbar">
+        <h1>Tableau de bord</h1>
+        &lt;!&ndash; #dates.format : formate la date du jour en français &ndash;&gt;
+        <span class="date-badge" th:text="${#dates.format(#dates.createNow(), 'EEEE dd MMMM yyyy')}">
+      Lundi 21 avril 2026
+    </span>
+    </div>
+
+    <div class="page-content">
+
+        &lt;!&ndash; ===== ALERTE SEUIL ===== &ndash;&gt;
+        &lt;!&ndash; th:if : ce bloc n'apparaît QUE si sousSeuil == true &ndash;&gt;
+        &lt;!&ndash; Si l'étudiant a un taux >= 75%, ce bloc est invisible &ndash;&gt;
+        <div class="alert-warning" th:if="${sousSeuil}">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div>
+                <strong>Attention !</strong>
+                Votre taux de présence global est de
+                &lt;!&ndash; th:text affiche le taux calculé par le service &ndash;&gt;
+                <strong th:text="${tauxGlobal + '%'}">81%</strong>
+                — en dessous du seuil requis de 75%. Veuillez régulariser vos absences.
+            </div>
+        </div>
+
+        &lt;!&ndash; ===== CARTES STATISTIQUES ===== &ndash;&gt;
+        <div class="stats-grid">
+
+            &lt;!&ndash; Carte 1 : nombre de présences &ndash;&gt;
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#d4edda;">
+                    <svg fill="none" stroke="#155724" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                &lt;!&ndash; #{T(long)} : compte les présences avec statut PRESENT dans la liste &ndash;&gt;
+                &lt;!&ndash; On calcule côté HTML : taille de la liste complète - absences &ndash;&gt;
+                <div class="stat-value" style="color:#155724;"
+                     th:text="${presences != null ? presences.size() : 0}">42</div>
+                <div class="stat-label">Enregistrements de présence</div>
+            </div>
+
+            &lt;!&ndash; Carte 2 : absences non justifiées &ndash;&gt;
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#f8d7da;">
+                    <svg fill="none" stroke="#721c24" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                &lt;!&ndash; absencesNonJustifiees = envoyé par le controller via model.addAttribute &ndash;&gt;
+                <div class="stat-value" style="color:#721c24;"
+                     th:text="${absencesNonJustifiees}">7</div>
+                <div class="stat-label">Absences non justifiées</div>
+            </div>
+
+            &lt;!&ndash; Carte 3 : taux global &ndash;&gt;
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fff3cd;">
+                    <svg fill="none" stroke="#856404" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                    </svg>
+                </div>
+                &lt;!&ndash; tauxGlobal = calculé par presenceService.calculerTauxGlobal(etudiantId) &ndash;&gt;
+                <div class="stat-value" style="color:#856404;"
+                     th:text="${tauxGlobal + '%'}">81%</div>
+                <div class="stat-label">Taux global (seuil : 75%)</div>
+            </div>
+
+            &lt;!&ndash; Carte 4 : département &ndash;&gt;
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#cce5ff;">
+                    <svg fill="none" stroke="#004085" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+                    </svg>
+                </div>
+                <div class="stat-value" style="font-size:16px;padding-top:6px;"
+                     th:text="${etudiant.departementNom}">Informatique</div>
+                <div class="stat-label" th:text="${etudiant.niveau}">Bachelor 4</div>
+            </div>
+
+        </div>&lt;!&ndash; fin stats-grid &ndash;&gt;
+
+        <div class="two-col">
+
+            &lt;!&ndash; ===== SÉANCES DU JOUR ===== &ndash;&gt;
+            <div class="card">
+                <div class="card-header">
+                    <h3>Séances d'aujourd'hui</h3>
+                    <a th:href="@{/etudiant/{id}/emploi-du-temps(id=${etudiant.id})}"
+                       class="btn btn-outline btn-sm">Voir tout</a>
+                </div>
+
+                &lt;!&ndash; th:if : affiche ce message si la liste est vide &ndash;&gt;
+                <div class="empty-msg" th:if="${#lists.isEmpty(seancesAujourdhui)}">
+                    Aucune séance prévue aujourd'hui.
+                </div>
+
+                &lt;!&ndash; th:unless = opposé de th:if : affiche si la liste N'EST PAS vide &ndash;&gt;
+                <div th:unless="${#lists.isEmpty(seancesAujourdhui)}">
+                    &lt;!&ndash; th:each = boucle : pour chaque séance dans seancesAujourdhui &ndash;&gt;
+                    &lt;!&ndash; "seance : ${seancesAujourdhui}" = variable locale : liste &ndash;&gt;
+                    <div class="seance-item" th:each="seance : ${seancesAujourdhui}">
+                        <div class="seance-dot"></div>
+                        &lt;!&ndash; th:text affiche l'heure de début et de fin de la séance &ndash;&gt;
+                        <span class="seance-time"
+                              th:text="${seance.heureDebut + ' – ' + seance.heureFin}">
+              08h00 – 10h00
+            </span>
+                        <div>
+                            &lt;!&ndash; seance.moduleIntitule = champ du SeanceDto &ndash;&gt;
+                            <div class="seance-module" th:text="${seance.moduleIntitule}">Algorithmique</div>
+                            &lt;!&ndash; Concatène salle + enseignant &ndash;&gt;
+                            <div class="seance-detail"
+                                 th:text="${'Salle ' + seance.salleNumero + ' · ' + seance.enseignantNom}">
+                                Salle 4 · M. Dilwani
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            &lt;!&ndash; ===== TAUX PAR MODULE ===== &ndash;&gt;
+            <div class="card">
+                <div class="card-header">
+                    <h3>Taux de présence par module</h3>
+                </div>
+
+                <div class="empty-msg" th:if="${tauxParModule == null or tauxParModule.isEmpty()}">
+                    Aucun module enregistré.
+                </div>
+
+                &lt;!&ndash; tauxParModule est une Map<String, Double> &ndash;&gt;
+                &lt;!&ndash; entry.key = nom du module, entry.value = taux (ex: 92.0) &ndash;&gt;
+                <div th:unless="${tauxParModule == null or tauxParModule.isEmpty()}">
+                    <div class="progress-row" th:each="entry : ${tauxParModule}">
+
+                        &lt;!&ndash; Nom du module &ndash;&gt;
+                        <span class="prog-label" th:text="${entry.key}">Algorithmique</span>
+
+                        &lt;!&ndash; Barre de progression : largeur = taux% &ndash;&gt;
+                        <div class="prog-bg">
+                            &lt;!&ndash; th:style : définit le style dynamiquement selon la valeur &ndash;&gt;
+                            &lt;!&ndash; th:classappend : ajoute une classe CSS selon la condition &ndash;&gt;
+                            <div class="prog-fill"
+                                 th:style="'width:' + ${entry.value} + '%;background:' +
+                             (${entry.value >= 75} ? '#27ae60' :
+                             (${entry.value >= 60} ? '#f39c12' : '#e74c3c'))">
+                            </div>
+                        </div>
+
+                        &lt;!&ndash; Pourcentage affiché à droite &ndash;&gt;
+                        <span class="prog-pct"
+                              th:style="'color:' + (${entry.value >= 75} ? '#155724' :
+                             (${entry.value >= 60} ? '#856404' : '#721c24'))"
+                              th:text="${entry.value + '%'}">92%</span>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>&lt;!&ndash; fin two-col &ndash;&gt;
+
+    </div>&lt;!&ndash; fin page-content &ndash;&gt;
+</div>&lt;!&ndash; fin main-content &ndash;&gt;
+
+</body>
+</html>
+-->

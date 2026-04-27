@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mes justificatifs</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; display: flex; }
+        .sidebar { width: 220px; min-height: 100vh; background: #1a237e; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; }
+        .sidebar-top { padding: 1.5rem 1rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .app-logo { font-size: 18px; font-weight: 700; color: #fff; }
+        .app-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .user-block { padding: 1rem; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .u-name { font-size: 13px; font-weight: 600; color: #fff; }
+        .u-info { font-size: 11px; color: rgba(255,255,255,0.5); }
+        .nav-section { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 1rem 4px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 1rem; font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; transition: background 0.15s; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-item.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
+        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .sidebar-spacer { flex: 1; }
+        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .main-content { margin-left: 220px; flex: 1; }
+        .topbar { background: #fff; border-bottom: 1px solid #e8ecf0; padding: 14px 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .topbar h1 { font-size: 16px; font-weight: 600; }
+        .page-content { padding: 1.5rem; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .card { background: #fff; border-radius: 12px; border: 1px solid #e8ecf0; margin-bottom: 1.25rem; overflow: hidden; }
+        .card-header { padding: 14px 1.25rem; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; justify-content: space-between; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+        .card-body { padding: 1.25rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th { font-size: 11px; font-weight: 600; color: #7f8c8d; text-align: left; padding: 10px 1.25rem; border-bottom: 1px solid #e8ecf0; background: #f8f9fa; }
+        tbody td { padding: 11px 1.25rem; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #f8f9fa; }
+        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-green  { background: #d4edda; color: #155724; }
+        .badge-red    { background: #f8d7da; color: #721c24; }
+        .badge-amber  { background: #fff3cd; color: #856404; }
+        .badge-blue   { background: #cce5ff; color: #004085; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #4a4a6a; display: block; margin-bottom: 6px; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+          width: 100%; padding: 9px 12px; font-size: 13px;
+          border: 1px solid #d0d7de; border-radius: 8px;
+          background: #fff; color: #1a1a2e; outline: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: #1a237e; box-shadow: 0 0 0 3px rgba(26,35,126,0.1); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .upload-zone { border: 2px dashed #d0d7de; border-radius: 10px; padding: 1.5rem; text-align: center; cursor: pointer; background: #f8f9fa; transition: border-color 0.2s; }
+        .upload-zone:hover { border-color: #1a237e; }
+        .upload-zone p { font-size: 13px; color: #7f8c8d; margin-top: 8px; }
+        .upload-zone span { color: #1a237e; font-weight: 600; }
+        .upload-zone .hint { font-size: 11px; margin-top: 4px; color: #aaa; }
+        .btn { padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.15s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: #1a237e; color: #fff; width: 100%; justify-content: center; margin-top: 8px; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .empty-msg { padding: 2rem; text-align: center; color: #7f8c8d; font-size: 13px; }
+        .alert-success { background: #d4edda; border: 1px solid #b8dacc; border-radius: 10px; padding: 12px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #155724; }
+        .alert-error { background: #f8d7da; border: 1px solid #f1c1c6; border-radius: 10px; padding: 12px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #721c24; }
+        .info-box { background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #0c5460; margin-bottom: 14px; }
+    </style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Espace Étudiant — FST</div>
+    </div>
+    <div class="user-block">
+        <div class="avatar"
+             th:text="${#strings.substring(etudiant.prenom,0,1) + #strings.substring(etudiant.nom,0,1)}">AK</div>
+        <div>
+            <div class="u-name" th:text="${etudiant.prenom + ' ' + etudiant.nom}">Dayyana</div>
+            <div class="u-info" th:text="${etudiant.matricule}">2204018</div>
+        </div>
+    </div>
+    <div class="nav-section">Mon espace</div>
+    <a th:href="@{/etudiant/dashboard/{id}(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Tableau de bord
+    </a>
+    <a th:href="@{/etudiant/{id}/presences(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Mes présences
+    </a>
+    <a th:href="@{/etudiant/{id}/emploi-du-temps(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Emploi du temps
+    </a>
+    <a th:href="@{/etudiant/{id}/justificatifs(id=${etudiant.id})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Justificatifs
+    </a>
+    <a th:href="@{/etudiant/{id}/statistiques(id=${etudiant.id})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Statistiques
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<div class="main-content">
+    <div class="topbar">
+        <h1>Mes justificatifs d'absence</h1>
+    </div>
+
+    <div class="page-content">
+
+        <!-- ===== MESSAGES FLASH ===== -->
+        <!-- th:if="${succes}" : affiché seulement si redirectAttributes a mis "succes" -->
+        <div class="alert-success" th:if="${succes}" th:text="${succes}"></div>
+        <div class="alert-error"   th:if="${erreur}" th:text="${erreur}"></div>
+
+        <div class="two-col">
+
+            <!-- ===== FORMULAIRE SOUMISSION ===== -->
+            <div class="card">
+                <div class="card-header"><h3>Soumettre un justificatif</h3></div>
+                <div class="card-body">
+
+                    <!-- th:if : affiche le formulaire seulement si l'étudiant a des absences -->
+                    <div th:if="${#lists.isEmpty(absences)}">
+                        <div class="info-box">
+                            Vous n'avez aucune absence non justifiée pour le moment.
+                        </div>
+                    </div>
+
+                    <!-- th:unless : affiche le formulaire si absences non vide -->
+                    <div th:unless="${#lists.isEmpty(absences)}">
+                        <div class="info-box">
+                            Sélectionnez une absence dans la liste, joignez un document et soumettez.
+                        </div>
+
+                        <!--
+                          th:action : URL du POST avec l'ID de l'étudiant
+                          enctype="multipart/form-data" : OBLIGATOIRE pour l'upload de fichier
+                          Sans cette ligne, le fichier n'est pas envoyé au serveur
+                        -->
+                        <form th:action="@{/etudiant/{id}/justificatifs/soumettre(id=${etudiant.id})}"
+                              method="post"
+                              enctype="multipart/form-data">
+
+                            <div class="form-group">
+                                <label>Séance concernée (absence) *</label>
+                                <!--
+                                  th:each sur un <select> : génère une <option> par absence
+                                  th:value : la valeur envoyée au serveur = presenceId
+                                  th:text  : le texte affiché à l'étudiant
+                                -->
+                                <select name="presenceId" required>
+                                    <option value="">-- Sélectionner une absence --</option>
+                                    <option th:each="absence : ${absences}"
+                                            th:value="${absence.id}"
+                                            th:text="${absence.seanceModuleNom + ' — ' +
+                                    (absence.datePresence != null ?
+                                    #temporals.format(absence.datePresence, 'dd/MM/yyyy')
+                                    : 'date inconnue')}">
+                                        Algorithmique — 17/04/2026
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Motif de l'absence *</label>
+                                <select name="motif" required>
+                                    <option value="">-- Choisir un motif --</option>
+                                    <option value="Maladie">Maladie</option>
+                                    <option value="Urgence familiale">Urgence familiale</option>
+                                    <option value="Accident">Accident</option>
+                                    <option value="Convocation officielle">Convocation officielle</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Description (optionnel)</label>
+                                <textarea name="description"
+                                          placeholder="Expliquez brièvement votre absence..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Document justificatif (recommandé)</label>
+                                <!--
+                                  name="fichier" : doit correspondre exactement au @RequestParam
+                                  dans JustificatifController
+                                  accept : types de fichiers autorisés
+                                -->
+                                <div class="upload-zone" onclick="document.getElementById('fichier-input').click()">
+                                    <svg width="32" height="32" fill="none" stroke="#7f8c8d" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                        <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                                    </svg>
+                                    <p>Glissez votre fichier ou <span>cliquez ici</span></p>
+                                    <p class="hint">PDF, JPG, PNG — max 5 Mo</p>
+                                    <input type="file"
+                                           id="fichier-input"
+                                           name="fichier"
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           style="display:none;"
+                                           onchange="afficherNomFichier(this)"/>
+                                </div>
+                                <!-- Affiche le nom du fichier sélectionné -->
+                                <p id="nom-fichier"
+                                   style="font-size:12px;color:#1a237e;margin-top:6px;"></p>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                Envoyer le justificatif
+                            </button>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===== HISTORIQUE JUSTIFICATIFS ===== -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Mes justificatifs soumis</h3>
+                    <span style="font-size:12px;color:#7f8c8d;"
+                          th:text="${justificatifs.size() + ' justificatif(s)'}">0 justificatif(s)</span>
+                </div>
+
+                <div class="empty-msg" th:if="${#lists.isEmpty(justificatifs)}">
+                    Vous n'avez encore soumis aucun justificatif.
+                </div>
+
+                <table th:unless="${#lists.isEmpty(justificatifs)}">
+                    <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Date séance</th>
+                        <th>Motif</th>
+                        <th>Statut</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- th:each : une ligne par justificatif soumis -->
+                    <tr th:each="j : ${justificatifs}">
+
+                        <td th:text="${j.presenceSeanceModuleNom}">Algorithmique</td>
+
+                        <td th:text="${j.presenceDateSeance != null ?
+                            #temporals.format(j.presenceDateSeance, 'dd/MM/yyyy')
+                            : '—'}">
+                            17/04/2026
+                        </td>
+
+                        <td th:text="${j.motif}">Maladie</td>
+
+                        <!-- Badge coloré selon le statut du justificatif -->
+                        <td th:switch="${j.statut.name()}">
+                            <span th:case="'EN_ATTENTE'" class="badge badge-amber">En attente</span>
+                            <span th:case="'ACCEPTE'"    class="badge badge-green">Accepté ✓</span>
+                            <span th:case="'REFUSE'"     class="badge badge-red">Refusé ✗</span>
+                            <span th:case="*"            class="badge badge-blue" th:text="${j.statut}">—</span>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Affiche le nom du fichier sélectionné sous la zone d'upload
+    function afficherNomFichier(input) {
+      const p = document.getElementById('nom-fichier');
+      if (input.files.length > 0) {
+        p.textContent = '✓ Fichier sélectionné : ' + input.files[0].name;
+      } else {
+        p.textContent = '';
+      }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Création de compte</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+<body>
+<h2>Créer un compte</h2>
+
+<div class="cards">
+
+    <div class="card" onclick="go('ETUDIANT')">👨‍🎓 Étudiant</div>
+    <div class="card" onclick="go('ENSEIGNANT')">👨‍🏫 Enseignant</div>
+
+</div>
+
+<script>
+    function go(role) {
+        if(role === "ETUDIANT") {
+            window.location.href = "/etudiants/new";
+        }
+        if(role === "ENSEIGNANT") {
+            window.location.href = "/enseignants/new";
+        }
+    }
+</script>
+<!--
+<h2>Créer un compte</h2>
+
+<label>Choisir le type de compte à créer :</label>
+
+<select id="roleSelect">
+    <option value="">&#45;&#45; Sélectionner &#45;&#45;</option>
+    <option value="ETUDIANT">Étudiant</option>
+    <option value="ENSEIGNANT">Enseignant</option>
+    <option value="CHEF_DEPARTEMENT">Chef département</option>
+    <option value="ADMIN">Admin</option>
+</select>
+
+<script>
+    document.getElementById("roleSelect").addEventListener("change", function () {
+
+        const role = this.value;
+
+        if (role === "ETUDIANT") {
+            window.location.href = "/etudiants/new";
+        }
+
+        else if (role === "ENSEIGNANT") {
+            window.location.href = "/enseignants/form";
+        }
+
+        else if (role === "CHEF_DEPARTEMENT") {
+            window.location.href = "/chefs/form";
+        }
+
+        else if (role === "ADMIN") {
+            window.location.href = "/utilisateurs/form";
+        }
+    });
+</script>
+-->
+
+</body>
+</html>

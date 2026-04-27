@@ -1,0 +1,51 @@
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/PresencePointage_DB
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # ✅ servlet est SOUS spring — correct
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+# ✅ app est AU MÊME NIVEAU que spring — pas en dessous !
+app:
+  upload:
+    dir: uploads/justificatifs
+
+  # Configuration pour voir les valeurs des paramètres (IDs)
+  # On descend dans la hiérarchie de logging
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: trace
+
+server:
+  error:
+    # Inclut le message personnalisé de l'exception dans la réponse JSON
+    include-message: always
+
+  port: 8080
+  address: 0.0.0.0

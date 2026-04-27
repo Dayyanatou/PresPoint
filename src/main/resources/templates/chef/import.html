@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Import étudiants</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; display: flex; }
+        .sidebar { width: 220px; min-height: 100vh; background: #0F6E56; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; }
+        .sidebar-top { padding: 1.5rem 1rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .app-logo { font-size: 18px; font-weight: 700; color: #fff; }
+        .app-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .user-block { padding: 1rem; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .u-name { font-size: 13px; font-weight: 600; color: #fff; }
+        .u-info { font-size: 11px; color: rgba(255,255,255,0.5); }
+        .nav-section { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 1rem 4px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 1rem; font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; transition: background 0.15s; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-item.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
+        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .sidebar-spacer { flex: 1; }
+        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .main-content { margin-left: 220px; flex: 1; }
+        .topbar { background: #fff; border-bottom: 1px solid #e8ecf0; padding: 14px 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .topbar h1 { font-size: 16px; font-weight: 600; }
+        .page-content { padding: 1.5rem; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .card { background: #fff; border-radius: 12px; border: 1px solid #e8ecf0; margin-bottom: 1.25rem; overflow: hidden; }
+        .card-header { padding: 14px 1.25rem; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; justify-content: space-between; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+        .card-body { padding: 1.25rem; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #4a4a6a; display: block; margin-bottom: 6px; }
+        .form-group select { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #d0d7de; border-radius: 8px; background: #fff; color: #1a1a2e; outline: none; }
+        .form-group select:focus { border-color: #0F6E56; box-shadow: 0 0 0 3px rgba(15,110,86,0.1); }
+        .upload-zone { border: 2px dashed #d0d7de; border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; background: #f8f9fa; transition: border-color 0.2s; }
+        .upload-zone:hover { border-color: #0F6E56; }
+        .upload-zone p { font-size: 13px; color: #7f8c8d; margin-top: 8px; }
+        .upload-zone span { color: #0F6E56; font-weight: 600; }
+        .upload-zone .hint { font-size: 11px; margin-top: 4px; color: #aaa; }
+        .info-box { background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 12px; font-size: 12px; color: #0c5460; margin-bottom: 14px; line-height: 1.6; }
+        .warn-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; font-size: 12px; color: #856404; margin-bottom: 14px; line-height: 1.6; }
+        .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.15s; width: 100%; justify-content: center; }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: #0F6E56; color: #fff; }
+        .btn-outline { background: #fff; color: #1a1a2e; border: 1px solid #d0d7de; margin-bottom: 8px; }
+        .alert-success { background: #d4edda; border: 1px solid #b8dacc; border-radius: 10px; padding: 14px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #155724; }
+        .alert-error { background: #f8d7da; border: 1px solid #f1c1c6; border-radius: 10px; padding: 14px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #721c24; }
+        .etape { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+        .etape-num { width: 26px; height: 26px; border-radius: 50%; background: #0F6E56; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+        .etape-texte { font-size: 13px; color: #4a4a6a; line-height: 1.5; }
+        .etape-texte strong { color: #1a1a2e; }
+    </style>
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Chef de Département — FST</div>
+    </div>
+    <div class="user-block">
+        <div class="avatar">CD</div>
+        <div>
+            <div class="u-name">Chef de Département</div>
+            <div class="u-info">Administration</div>
+        </div>
+    </div>
+    <div class="nav-section">Tableau de bord</div>
+    <a th:href="@{/chef/dashboard/{id}(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Vue d'ensemble
+    </a>
+    <div class="nav-section">Gestion</div>
+    <a th:href="@{/chef/departement/{id}/etudiants(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Étudiants
+    </a>
+    <a th:href="@{/chef/departement/{id}/import(id=${departementId})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Importer étudiants
+    </a>
+    <a th:href="@{/chef/departement/{id}/justificatifs(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Justificatifs
+    </a>
+    <a th:href="@{/chef/departement/{id}/statistiques(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Statistiques
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="topbar">
+        <h1>Importer une liste d'étudiants</h1>
+    </div>
+
+    <div class="page-content">
+
+        <!-- Messages flash -->
+        <div class="alert-success" th:if="${succes}" th:text="${succes}"></div>
+        <div class="alert-error"   th:if="${erreur}" th:text="${erreur}"></div>
+
+        <div class="two-col">
+
+            <!-- Formulaire import -->
+            <div class="card">
+                <div class="card-header"><h3>Importer un fichier</h3></div>
+                <div class="card-body">
+
+                    <div class="info-box">
+                        <strong>Colonnes requises dans le fichier :</strong><br/>
+                        Colonne A : <strong>Nom</strong> · Colonne B : <strong>Prénom</strong> ·
+                        Colonne C : <strong>Email</strong> · Colonne D : <strong>Matricule</strong> ·
+                        Colonne E : <strong>Téléphone</strong> (optionnel)<br/><br/>
+                        La première ligne est considérée comme l'en-tête et sera ignorée.
+                    </div>
+
+                    <!--
+                      enctype="multipart/form-data" : obligatoire pour l'upload de fichier
+                      th:action : URL POST avec departementId
+                    -->
+                    <form th:action="@{/chef/departement/{id}/import(id=${departementId})}"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <div class="form-group">
+                            <label>Niveau / Departement *</label>
+                            <select name="niveau" required>
+                                <option value="">-- Sélectionner le niveau --</option>
+                                <option value="Bachelor 1">Bachelor 1</option>
+                                <option value="Bachelor 2">Bachelor 2</option>
+                                <option value="Bachelor 3">Bachelor 3</option>
+                                <option value="Bachelor 4">Bachelor 4</option>
+                                <option value="Master">Master</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fichier Excel (.xlsx) ou CSV (.csv) *</label>
+                            <div class="upload-zone"
+                                 onclick="document.getElementById('fichier-import').click()">
+                                <svg width="36" height="36" fill="none" stroke="#7f8c8d" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <p>Glissez votre fichier ici ou <span>cliquez pour choisir</span></p>
+                                <p class="hint">.xlsx ou .csv — taille maximale 10 Mo</p>
+                                <input type="file"
+                                       id="fichier-import"
+                                       name="fichier"
+                                       accept=".xlsx,.csv"
+                                       style="display:none;"
+                                       onchange="afficherFichier(this)"
+                                       required/>
+                            </div>
+                            <p id="nom-fichier"
+                               style="font-size:12px;color:#0F6E56;margin-top:6px;font-weight:600;"></p>
+                        </div>
+
+                        <div class="warn-box">
+                            ⚠️ Le mot de passe temporaire de chaque étudiant sera
+                            son <strong>matricule</strong>. Il devra le changer à sa première connexion.
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Lancer l'import
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Guide d'utilisation -->
+            <div>
+                <div class="card">
+                    <div class="card-header"><h3>Comment préparer votre fichier</h3></div>
+                    <div class="card-body">
+                        <div class="etape">
+                            <div class="etape-num">1</div>
+                            <div class="etape-texte">
+                                <strong>Téléchargez le modèle</strong> Excel ci-dessous et
+                                ouvrez-le dans Excel ou LibreOffice.
+                            </div>
+                        </div>
+                        <div class="etape">
+                            <div class="etape-num">2</div>
+                            <div class="etape-texte">
+                                <strong>Remplissez les colonnes</strong> : Nom, Prénom, Email,
+                                Matricule, Téléphone (optionnel). Ne supprimez pas la ligne d'en-tête.
+                            </div>
+                        </div>
+                        <div class="etape">
+                            <div class="etape-num">3</div>
+                            <div class="etape-texte">
+                                <strong>Sauvegardez</strong> le fichier en .xlsx ou exportez-le
+                                en .csv (Format CSV UTF-8).
+                            </div>
+                        </div>
+                        <div class="etape">
+                            <div class="etape-num">4</div>
+                            <div class="etape-texte">
+                                <strong>Sélectionnez le niveau</strong>, choisissez votre fichier
+                                et cliquez sur "Lancer l'import".
+                            </div>
+                        </div>
+                        <div class="etape">
+                            <div class="etape-num">5</div>
+                            <div class="etape-texte">
+                                Chaque étudiant importé reçoit comme
+                                <strong>mot de passe temporaire son matricule</strong>.
+                                Il devra le changer à la première connexion.
+                            </div>
+                        </div>
+
+                        <a href="#" class="btn btn-outline" style="margin-top:8px;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Télécharger le modèle Excel
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Exemple de fichier CSV</h3></div>
+                    <div class="card-body">
+                        <div style="background:#f8f9fa;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#4a4a6a;line-height:1.8;">
+                            Nom;Prenom;Email;Matricule;Telephone<br/>
+                            Magagi;Dayyana;jineidoumagagingaridayyanantou@gmail.com;2204017;70123456<br/>
+                            Sanda;Amadou;asanda@gmail.com.;2406043;89456789<br/>
+                            Diallo;Aissata;adiallo@gmail.com;2204013;
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function afficherFichier(input) {
+      const p = document.getElementById('nom-fichier');
+      if (input.files.length > 0) {
+        p.textContent = '✓ Fichier sélectionné : ' + input.files[0].name;
+      }
+    }
+</script>
+
+</body>
+</html>

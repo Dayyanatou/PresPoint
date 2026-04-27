@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Dashboard Admin</h1>
+
+<button onclick="window.location.href='/admin/utilisateurs/choix-role'">
+    ➕ Créer un compte
+</button>
+
+<h2>Voir les comptes</h2>
+
+<button onclick="filterRole('ALL')">Tous</button>
+<button onclick="filterRole('ETUDIANT')">Étudiants</button>
+<button onclick="filterRole('ENSEIGNANT')">Enseignants</button>
+
+<div id="tableZone"></div>
+
+<script src="/js/admin-dashboard.js"></script>
+</body>
+</html>
