@@ -4,53 +4,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Étudiants — Chef de Département</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; display: flex; }
-        .sidebar { width: 220px; min-height: 100vh; background: #0F6E56; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; }
-        .sidebar-top { padding: 1.5rem 1rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .app-logo { font-size: 18px; font-weight: 700; color: #fff; }
-        .app-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-        .user-block { padding: 1rem; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
-        .u-name { font-size: 13px; font-weight: 600; color: #fff; }
-        .u-info { font-size: 11px; color: rgba(255,255,255,0.5); }
-        .nav-section { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 1rem 4px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 1rem; font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; transition: background 0.15s; }
-        .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .nav-item.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
-        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-        .sidebar-spacer { flex: 1; }
-        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
-        .main-content { margin-left: 220px; flex: 1; }
-        .topbar { background: #fff; border-bottom: 1px solid #e8ecf0; padding: 14px 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-        .topbar h1 { font-size: 16px; font-weight: 600; }
-        .topbar-right { display: flex; align-items: center; gap: 10px; }
-        .page-content { padding: 1.5rem; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid #e8ecf0; margin-bottom: 1.25rem; overflow: hidden; }
-        .card-header { padding: 14px 1.25rem; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-        .card-header h3 { font-size: 14px; font-weight: 600; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        thead th { font-size: 11px; font-weight: 600; color: #7f8c8d; text-align: left; padding: 10px 1.25rem; border-bottom: 1px solid #e8ecf0; background: #f8f9fa; }
-        tbody td { padding: 11px 1.25rem; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-        tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: #f8f9fa; }
-        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .badge-green  { background: #d4edda; color: #155724; }
-        .badge-red    { background: #f8d7da; color: #721c24; }
-        .badge-amber  { background: #fff3cd; color: #856404; }
-        .badge-blue   { background: #cce5ff; color: #004085; }
-        .btn { padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.15s; }
-        .btn:hover { opacity: 0.85; }
-        .btn-primary { background: #0F6E56; color: #fff; }
-        .btn-outline { background: #fff; color: #1a1a2e; border: 1px solid #d0d7de; }
-        .btn-sm { padding: 5px 12px; font-size: 12px; }
-        .empty-msg { padding: 2rem; text-align: center; color: #7f8c8d; font-size: 13px; }
-        .notif-badge { display: inline-flex; align-items: center; justify-content: center; background: #e74c3c; color: #fff; border-radius: 20px; font-size: 11px; font-weight: 700; padding: 2px 8px; margin-left: 6px; }
-        .search-input { padding: 8px 12px; font-size: 13px; border: 1px solid #d0d7de; border-radius: 8px; outline: none; width: 220px; }
-        .search-input:focus { border-color: #0F6E56; }
-        .sous-seuil-row td { background: #fff8f8 !important; }
-    </style>
+    <link href="/css/etudiants-chef.css" rel="stylesheet"/>
 </head>
 <body>
 
@@ -79,6 +33,10 @@
               th:if="${!#lists.isEmpty(etudiantsSousSeuil)}"
               th:text="${etudiantsSousSeuil.size()}">0</span>
     </a>
+    <a th:href="@{/chef/departement/{id}/groupes(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Groupes
+    </a>
     <a th:href="@{/chef/departement/{id}/import(id=${departementId})}" class="nav-item">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Importer étudiants
@@ -104,10 +62,27 @@
     <div class="topbar">
         <h1>Liste des étudiants</h1>
         <div class="topbar-right">
+
+            <!-- Filtre par niveau — soumis vers le serveur -->
+            <form th:action="@{/chef/departement/{id}/etudiants(id=${departementId})}"
+                  method="get" style="display:flex;gap:8px;align-items:center;">
+                <select name="niveau" class="filter-select"
+                        onchange="this.form.submit()">
+                    <option value="">Tous les niveaux</option>
+                    <option th:each="niv : ${niveauxDisponibles}"
+                            th:value="${niv}"
+                            th:text="${niv}"
+                            th:selected="${niv == niveauSelectionne}">
+                        Info 1
+                    </option>
+                </select>
+            </form>
+
             <!-- Recherche côté client -->
             <input class="search-input" type="text"
-                   id="recherche" placeholder="Rechercher un étudiant..."
+                   id="recherche" placeholder="Rechercher..."
                    onkeyup="filtrerTableau()"/>
+
             <a th:href="@{/chef/departement/{id}/import(id=${departementId})}"
                class="btn btn-primary btn-sm">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -118,28 +93,37 @@
 
     <div class="page-content">
 
-        <!-- Résumé -->
-        <div style="display:flex;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;">
-            <div style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:12px 20px;font-size:13px;">
-                Total : <strong th:text="${etudiants.size()}">0</strong> étudiant(s)
+        <!-- Barre de stats -->
+        <div class="stats-bar">
+            <div class="stat-pill">
+                Total affiché : <strong th:text="${etudiants.size()}">0</strong> étudiant(s)
+                <span th:if="${niveauSelectionne != null and !niveauSelectionne.isEmpty()}"
+                      th:text="' — Niveau : ' + ${niveauSelectionne}"
+                      style="color:#0F6E56;font-weight:600;"></span>
             </div>
-            <div style="background:#f8d7da;border:1px solid #f1c1c6;border-radius:10px;padding:12px 20px;font-size:13px;color:#721c24;"
+            <div class="stat-pill stat-pill-danger"
                  th:if="${!#lists.isEmpty(etudiantsSousSeuil)}">
                 ⚠ <strong th:text="${etudiantsSousSeuil.size()}">0</strong>
                 étudiant(s) sous le seuil de 75%
             </div>
         </div>
 
-        <!-- Tableau étudiants -->
+        <!-- Tableau principal -->
         <div class="card">
             <div class="card-header">
-                <h3>Tous les étudiants du département</h3>
+                <h3>
+                    Étudiants
+                    <span th:if="${niveauSelectionne != null and !niveauSelectionne.isEmpty()}"
+                          th:text="' — ' + ${niveauSelectionne}"></span>
+                </h3>
                 <span style="font-size:12px;color:#7f8c8d;"
                       th:text="${etudiants.size() + ' étudiant(s)'}">0 étudiant(s)</span>
             </div>
 
             <div class="empty-msg" th:if="${#lists.isEmpty(etudiants)}">
-                Aucun étudiant dans ce département.
+                Aucun étudiant
+                <span th:if="${niveauSelectionne != null and !niveauSelectionne.isEmpty()}"
+                      th:text="'pour le niveau ' + ${niveauSelectionne}"></span>.
                 <a th:href="@{/chef/departement/{id}/import(id=${departementId})}"
                    style="color:#0F6E56;font-weight:600;">Importer une liste →</a>
             </div>
@@ -150,51 +134,56 @@
                     <th>Nom complet</th>
                     <th>Matricule</th>
                     <th>Niveau</th>
+                    <th>Groupe</th>
                     <th>Email</th>
                     <th>Statut compte</th>
                     <th>Présence</th>
                 </tr>
                 </thead>
                 <tbody>
-                <!--
-                  th:each : une ligne par étudiant
-                  On vérifie si l'étudiant est dans la liste etudiantsSousSeuil
-                  pour colorer la ligne en rouge
-                -->
                 <tr th:each="etudiant : ${etudiants}"
                     th:classappend="${etudiantsSousSeuil != null and
                                    etudiantsSousSeuil.![etudiantId].contains(etudiant.id)}
                                    ? 'sous-seuil-row' : ''">
 
-                    <td th:text="${etudiant.prenom + ' ' + etudiant.nom}">Aïcha Kouyaté</td>
-                    <td style="font-size:12px;color:#7f8c8d;"
-                        th:text="${etudiant.matricule}">EL-2024-0312</td>
-                    <td th:text="${etudiant.niveau}">Licence 3</td>
-                    <td style="font-size:12px;"
-                        th:text="${etudiant.email}">a.kouyate@fst.edu.ne</td>
+                    <td th:text="${etudiant.prenom + ' ' + etudiant.nom}">Aïcha Moussa</td>
 
-                    <!-- Statut du compte : actif ou désactivé -->
+                    <td class="cell-muted" th:text="${etudiant.matricule}">INF2504001</td>
+
+                    <td th:text="${etudiant.niveau}">Info 1</td>
+
+                    <!-- Groupe : G1, G2 ou non assigné -->
+                    <td>
+                        <span th:if="${etudiant.groupe != null and etudiant.groupe == 'G1'}"
+                        class="badge badge-blue">G1</span>
+                        <span th:if="${etudiant.groupe != null and etudiant.groupe == 'G2'}"
+                              class="badge badge-green">G2</span>
+                        <span th:if="${etudiant.groupe == null}"
+                              class="badge badge-gray">—</span>
+                    </td>
+
+                    <td class="cell-muted"
+                        th:text="${etudiant.email != null ? etudiant.email : '—'}">—</td>
+
                     <td>
                         <span th:if="${etudiant.statut}" class="badge badge-green">Actif</span>
                         <span th:unless="${etudiant.statut}" class="badge badge-red">Inactif</span>
                     </td>
 
-                    <!-- Indicateur présence : sous seuil ou non -->
                     <td>
-              <span th:if="${etudiantsSousSeuil != null and
-                             etudiantsSousSeuil.![etudiantId].contains(etudiant.id)}"
-                    class="badge badge-red">⚠ Sous seuil</span>
+                        <span th:if="${etudiantsSousSeuil != null and
+                                      etudiantsSousSeuil.![etudiantId].contains(etudiant.id)}"
+                              class="badge badge-red">⚠ Sous seuil</span>
                         <span th:unless="${etudiantsSousSeuil != null and
-                                 etudiantsSousSeuil.![etudiantId].contains(etudiant.id)}"
+                                          etudiantsSousSeuil.![etudiantId].contains(etudiant.id)}"
                               class="badge badge-green">Normal</span>
                     </td>
-
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Tableau étudiants sous le seuil -->
+        <!-- Tableau sous seuil -->
         <div class="card" th:if="${!#lists.isEmpty(etudiantsSousSeuil)}">
             <div class="card-header">
                 <h3>Étudiants sous le seuil de présence (75%)</h3>
@@ -214,9 +203,8 @@
                 <tbody>
                 <tr th:each="e : ${etudiantsSousSeuil}">
                     <td th:text="${e.nomComplet}">Moussa Harouna</td>
-                    <td style="font-size:12px;color:#7f8c8d;"
-                        th:text="${e.matricule}">EL-2024-0201</td>
-                    <td th:text="${e.niveau}">Licence 3</td>
+                    <td class="cell-muted" th:text="${e.matricule}">INF2504001</td>
+                    <td th:text="${e.niveau}">Info 1</td>
                     <td>
                         <strong th:text="${e.tauxGlobal + '%'}"
                                 th:style="'color:' + (${e.tauxGlobal < 70} ? '#721c24' : '#856404')">
@@ -232,17 +220,6 @@
     </div>
 </div>
 
-<script>
-    // Filtre le tableau selon la recherche
-    function filtrerTableau() {
-      const recherche = document.getElementById('recherche').value.toLowerCase();
-      const lignes = document.querySelectorAll('#tableau-etudiants tbody tr');
-      lignes.forEach(ligne => {
-        const texte = ligne.textContent.toLowerCase();
-        ligne.style.display = texte.includes(recherche) ? '' : 'none';
-      });
-    }
-</script>
-
+<script src="/js/etudiants-chef.js"></script>
 </body>
 </html>

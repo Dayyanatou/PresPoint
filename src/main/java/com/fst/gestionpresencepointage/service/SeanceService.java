@@ -20,4 +20,7 @@ public interface SeanceService {
     // Dans SeanceService.java — ajouter ces deux lignes
     List<SeanceDto> getSeancesAujourdhui(Long departementId);
     List<SeanceDto> getSeancesDeLaSemaine(Long departementId);
+    List<SeanceDto> getPlanningParDepartement(Long departementId);
+    List<SeanceDto> getPlanningParEnseignant(Long enseignantId);
+    SeanceDto creerSeancePlanifiee(SeanceDto dto);
 }

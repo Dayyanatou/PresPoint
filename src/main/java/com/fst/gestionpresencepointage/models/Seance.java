@@ -56,6 +56,18 @@ public class Seance {
     private TypeSeance typeSeance;
 
 
+    // Jour de la semaine fixe : LUNDI, MARDI, MERCREDI, JEUDI, VENDREDI, SAMEDI
+    @Column(length = 20)
+    private String jourSemaine; // "LUNDI", "MARDI"...
+
+    // Date de fin du semestre (fin de la récurrence)
+    private LocalDate dateFinSemestre;
+
+    // Indique si c'est une séance récurrente du planning
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean recurrente = false;
+
     //Plusieurs séances appartiennent à un même module
     @ManyToOne
     @JoinColumn(name = "module_id", nullable = false)

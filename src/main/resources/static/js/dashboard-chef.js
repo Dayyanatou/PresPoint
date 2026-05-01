@@ -58,3 +58,48 @@ function confirmAction(message = 'Êtes-vous sûr ?') {
 window.DashboardChef = {
     confirmAction: confirmAction
 };
+
+
+let modalAccepter = true; // true = accepter, false = refuser
+    let justificatifIdCourant = null;
+
+    // Ouvre le modal avec les bonnes infos selon le bouton cliqué
+    function ouvrirModal(justificatifId, accepter) {
+      justificatifIdCourant = justificatifId;
+      modalAccepter = accepter;
+
+      // Changer le titre selon l'action
+      document.getElementById('modal-titre').textContent =
+        accepter ? 'Accepter ce justificatif' : 'Refuser ce justificatif';
+
+      // Changer la couleur du bouton confirmer
+      const btnConfirmer = document.getElementById('modal-btn-confirmer');
+      btnConfirmer.style.background = accepter ? '#0F6E56' : '#c0392b';
+
+      // Afficher le modal
+      document.getElementById('modal-commentaire').classList.add('visible');
+      document.getElementById('modal-commentaire-texte').value = '';
+    }
+
+    function fermerModal() {
+      document.getElementById('modal-commentaire').classList.remove('visible');
+    }
+
+    // Soumet le formulaire vers la bonne URL (accepter ou refuser)
+    function confirmerAction() {
+      const commentaire = document.getElementById('modal-commentaire-texte').value;
+      document.getElementById('modal-commentaire-hidden').value = commentaire;
+
+      // Construire l'URL : /chef/justificatifs/{id}/accepter ou /refuser
+      const action = modalAccepter ? 'accepter' : 'refuser';
+      const form = document.getElementById('modal-form');
+      form.action = '/chef/justificatifs/' + justificatifIdCourant + '/' + action;
+
+      form.submit();
+      fermerModal();
+    }
+
+    // Fermer le modal si on clique en dehors
+    document.getElementById('modal-commentaire').addEventListener('click', function(e) {
+      if (e.target === this) fermerModal();
+    });

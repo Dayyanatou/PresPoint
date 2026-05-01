@@ -22,4 +22,10 @@ public interface EtudiantService {
     EtudiantDto modifier(Long id, EtudiantDto dto);
 
     void supprimer(Long id);
+
+    // Assigner un groupe à une liste d'étudiants
+    void assignerGroupe(List<Long> etudiantIds, String groupe);
+
+    // Lister par département ET niveau
+    List<EtudiantDto> listerParDepartementEtNiveau(Long departementId, String niveau);
 }

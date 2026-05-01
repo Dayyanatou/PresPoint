@@ -21,4 +21,7 @@ public interface ModuleCoursService {
     List<ModuleCours> rechercherParIntitule(String motCle);
 
     void supprimer(Long id);
+
+    ModuleCours modifier(Long id, ModuleCours moduleCours);
+    List<ModuleCours> listerParDepartementEtNiveau(Long departementId, String niveau);
 }

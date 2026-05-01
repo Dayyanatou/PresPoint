@@ -21,4 +21,11 @@ public interface ModuleCoursRepository extends JpaRepository<ModuleCours, Long> 
     List<ModuleCours> findByIntituleContainingIgnoreCase(String motCle);
 
     List<ModuleCours> findBySemestre(Semestre semestre);
+
+    // Modules d'un département + niveau
+    List<ModuleCours> findByDepartementAndNiveau(Departement departement, String niveau);
+
+    // Modules d'un département + niveau + groupe
+    List<ModuleCours> findByDepartementAndNiveauAndGroupe(
+            Departement departement, String niveau, String groupe);
 }

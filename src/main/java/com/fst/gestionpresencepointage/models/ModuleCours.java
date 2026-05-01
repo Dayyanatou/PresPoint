@@ -39,6 +39,12 @@ public class ModuleCours {
     //Semestre d'appartenance.
     private Semestre semestre;
 
+    @Column(length = 50)
+    private String niveau; // "Info 1", "Info 2", "Télécom 3"
+
+    @Column(length = 10)
+    private String groupe; // "G1", "G2", null = cours commun
+
     //Plusieurs modules appartiennent à un même département
 
     @ManyToOne

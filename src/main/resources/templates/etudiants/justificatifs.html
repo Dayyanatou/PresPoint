@@ -4,7 +4,9 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Mes justificatifs</title>
-    <style>
+
+    <link href="/css/dashboard-etudiant-ambre.css" rel="stylesheet"/>
+    <!--<style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; display: flex; }
         .sidebar { width: 220px; min-height: 100vh; background: #1a237e; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; }
@@ -69,7 +71,7 @@
         .alert-error { background: #f8d7da; border: 1px solid #f1c1c6; border-radius: 10px; padding: 12px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #721c24; }
         .info-box { background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #0c5460; margin-bottom: 14px; }
     </style>
-</head>
+--></head>
 <body>
 
 <!-- ===== SIDEBAR ===== -->
@@ -286,7 +288,8 @@
 </div>
 
 <script>
-    // Affiche le nom du fichier sélectionné sous la zone d'upload
+    <script src="/js/dashboard-etudiant.js"></script>
+    <!--// Affiche le nom du fichier sélectionné sous la zone d'upload
     function afficherNomFichier(input) {
       const p = document.getElementById('nom-fichier');
       if (input.files.length > 0) {
@@ -294,7 +297,7 @@
       } else {
         p.textContent = '';
       }
-    }
+    }-->
 </script>
 
 </body>

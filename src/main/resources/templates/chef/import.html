@@ -4,55 +4,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Import étudiants</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; display: flex; }
-        .sidebar { width: 220px; min-height: 100vh; background: #0F6E56; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; }
-        .sidebar-top { padding: 1.5rem 1rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .app-logo { font-size: 18px; font-weight: 700; color: #fff; }
-        .app-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-        .user-block { padding: 1rem; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
-        .u-name { font-size: 13px; font-weight: 600; color: #fff; }
-        .u-info { font-size: 11px; color: rgba(255,255,255,0.5); }
-        .nav-section { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 1rem 4px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 1rem; font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; transition: background 0.15s; }
-        .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .nav-item.active { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
-        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-        .sidebar-spacer { flex: 1; }
-        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
-        .main-content { margin-left: 220px; flex: 1; }
-        .topbar { background: #fff; border-bottom: 1px solid #e8ecf0; padding: 14px 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-        .topbar h1 { font-size: 16px; font-weight: 600; }
-        .page-content { padding: 1.5rem; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid #e8ecf0; margin-bottom: 1.25rem; overflow: hidden; }
-        .card-header { padding: 14px 1.25rem; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; justify-content: space-between; }
-        .card-header h3 { font-size: 14px; font-weight: 600; }
-        .card-body { padding: 1.25rem; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #4a4a6a; display: block; margin-bottom: 6px; }
-        .form-group select { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #d0d7de; border-radius: 8px; background: #fff; color: #1a1a2e; outline: none; }
-        .form-group select:focus { border-color: #0F6E56; box-shadow: 0 0 0 3px rgba(15,110,86,0.1); }
-        .upload-zone { border: 2px dashed #d0d7de; border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; background: #f8f9fa; transition: border-color 0.2s; }
-        .upload-zone:hover { border-color: #0F6E56; }
-        .upload-zone p { font-size: 13px; color: #7f8c8d; margin-top: 8px; }
-        .upload-zone span { color: #0F6E56; font-weight: 600; }
-        .upload-zone .hint { font-size: 11px; margin-top: 4px; color: #aaa; }
-        .info-box { background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 12px; font-size: 12px; color: #0c5460; margin-bottom: 14px; line-height: 1.6; }
-        .warn-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; font-size: 12px; color: #856404; margin-bottom: 14px; line-height: 1.6; }
-        .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.15s; width: 100%; justify-content: center; }
-        .btn:hover { opacity: 0.85; }
-        .btn-primary { background: #0F6E56; color: #fff; }
-        .btn-outline { background: #fff; color: #1a1a2e; border: 1px solid #d0d7de; margin-bottom: 8px; }
-        .alert-success { background: #d4edda; border: 1px solid #b8dacc; border-radius: 10px; padding: 14px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #155724; }
-        .alert-error { background: #f8d7da; border: 1px solid #f1c1c6; border-radius: 10px; padding: 14px 1.25rem; margin-bottom: 1.25rem; font-size: 13px; color: #721c24; }
-        .etape { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-        .etape-num { width: 26px; height: 26px; border-radius: 50%; background: #0F6E56; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-        .etape-texte { font-size: 13px; color: #4a4a6a; line-height: 1.5; }
-        .etape-texte strong { color: #1a1a2e; }
-    </style>
+    <link href="/css/import.css" rel="stylesheet"/>
 </head>
 <body>
 
@@ -118,35 +70,63 @@
                 <div class="card-body">
 
                     <div class="info-box">
-                        <strong>Colonnes requises dans le fichier :</strong><br/>
-                        Colonne A : <strong>Nom</strong> · Colonne B : <strong>Prénom</strong> ·
-                        Colonne C : <strong>Email</strong> · Colonne D : <strong>Matricule</strong> ·
-                        Colonne E : <strong>Téléphone</strong> (optionnel)<br/><br/>
-                        La première ligne est considérée comme l'en-tête et sera ignorée.
+                        <strong>Format de la liste FST accepté :</strong><br/>
+                        Le fichier doit avoir le format officiel de la FST :<br/>
+                        — Ligne 1 à 6 : en-tête université (ignorées automatiquement)<br/>
+                        — Ligne 7 : entête colonnes (N° | Matricule | Nom et prénoms)<br/>
+                        — Ligne 8+ : données des étudiants<br/><br/>
+                        Le matricule servira de <strong>mot de passe temporaire</strong> et de <strong>username</strong>.
                     </div>
 
-                    <!--
-                      enctype="multipart/form-data" : obligatoire pour l'upload de fichier
-                      th:action : URL POST avec departementId
-                    -->
                     <form th:action="@{/chef/departement/{id}/import(id=${departementId})}"
                           method="post"
                           enctype="multipart/form-data">
 
+                        <!-- Sélection du département -->
                         <div class="form-group">
-                            <label>Niveau / Departement *</label>
-                            <select name="niveau" required>
-                                <option value="">-- Sélectionner le niveau --</option>
-                                <option value="Bachelor 1">Bachelor 1</option>
-                                <option value="Bachelor 2">Bachelor 2</option>
-                                <option value="Bachelor 3">Bachelor 3</option>
-                                <option value="Bachelor 4">Bachelor 4</option>
-                                <option value="Master">Master</option>
+                            <label>Département *</label>
+                            <select name="departementId" required>
+                                <option value="">-- Sélectionner le département --</option>
+                                <option th:each="dep : ${departements}"
+                                        th:value="${dep.id}"
+                                        th:text="${dep.nom}"
+                                        th:selected="${dep.id == departementId}">
+                                    Informatique
+                                </option>
                             </select>
                         </div>
 
+                        <!-- Sélection du niveau -->
                         <div class="form-group">
-                            <label>Fichier Excel (.xlsx) ou CSV (.csv) *</label>
+                            <label>Niveau *</label>
+                            <select name="niveau" required>
+                                <option value="">-- Sélectionner le niveau --</option>
+                                <!-- Informatique -->
+                                <optgroup label="Informatique">
+                                    <option value="Info 1">Info 1 (1ère Année)</option>
+                                    <option value="Info 2">Info 2 (2ème Année)</option>
+                                    <option value="Info 3">Info 3 (3ème Année)</option>
+                                    <option value="Info 4 - Sécurité">Info 4 - Option Sécurité</option>
+                                    <option value="Info 4 - Génie Logiciel">Info 4 - Option Génie Logiciel</option>
+                                </optgroup>
+                                <!-- Télécoms -->
+                                <optgroup label="Télécommunications">
+                                    <option value="Télécom 1">Télécom 1 (1ère Année)</option>
+                                    <option value="Télécom 2">Télécom 2 (2ème Année)</option>
+                                    <option value="Télécom 3">Télécom 3 (3ème Année)</option>
+                                    <option value="Télécom 4">Télécom 4 (4ème Année)</option>
+                                </optgroup>
+                                <!-- Master -->
+                                <optgroup label="Master">
+                                    <option value="Master Pro">Master Professionnel</option>
+                                    <option value="Master Recherche">Master de Recherche</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- Upload fichier -->
+                        <div class="form-group">
+                            <label>Fichier Excel (.xlsx) *</label>
                             <div class="upload-zone"
                                  onclick="document.getElementById('fichier-import').click()">
                                 <svg width="36" height="36" fill="none" stroke="#7f8c8d" stroke-width="1.5" viewBox="0 0 24 24">
@@ -155,11 +135,11 @@
                                     <line x1="12" y1="3" x2="12" y2="15"/>
                                 </svg>
                                 <p>Glissez votre fichier ici ou <span>cliquez pour choisir</span></p>
-                                <p class="hint">.xlsx ou .csv — taille maximale 10 Mo</p>
+                                <p class="hint">Format officiel FST .xlsx — taille maximale 10 Mo</p>
                                 <input type="file"
                                        id="fichier-import"
                                        name="fichier"
-                                       accept=".xlsx,.csv"
+                                       accept=".xlsx"
                                        style="display:none;"
                                        onchange="afficherFichier(this)"
                                        required/>
@@ -169,77 +149,80 @@
                         </div>
 
                         <div class="warn-box">
-                            ⚠️ Le mot de passe temporaire de chaque étudiant sera
-                            son <strong>matricule</strong>. Il devra le changer à sa première connexion.
+                            ⚠️ Le mot de passe temporaire de chaque étudiant sera son <strong>matricule</strong>
+                            (ex: INF2504001). Il devra le changer à sa première connexion.
+                            Le groupe (G1/G2) sera assigné après l'import.
                         </div>
 
                         <button type="submit" class="btn btn-primary">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                             Lancer l'import
                         </button>
-
                     </form>
                 </div>
             </div>
 
-            <!-- Guide d'utilisation -->
+            <!-- Guide -->
             <div>
                 <div class="card">
-                    <div class="card-header"><h3>Comment préparer votre fichier</h3></div>
+                    <div class="card-header"><h3>Comment importer la liste FST</h3></div>
                     <div class="card-body">
                         <div class="etape">
                             <div class="etape-num">1</div>
                             <div class="etape-texte">
-                                <strong>Téléchargez le modèle</strong> Excel ci-dessous et
-                                ouvrez-le dans Excel ou LibreOffice.
+                                <strong>Récupérez la liste officielle</strong> de la scolarité au format Excel
+                                (.xlsx) — c'est le format habituel avec l'en-tête université en haut.
                             </div>
                         </div>
                         <div class="etape">
                             <div class="etape-num">2</div>
                             <div class="etape-texte">
-                                <strong>Remplissez les colonnes</strong> : Nom, Prénom, Email,
-                                Matricule, Téléphone (optionnel). Ne supprimez pas la ligne d'en-tête.
+                                <strong>Ne modifiez pas la structure</strong> du fichier. Le système reconnaît
+                                automatiquement les colonnes <strong>Matricule</strong> et <strong>Nom et prénoms</strong>.
                             </div>
                         </div>
                         <div class="etape">
                             <div class="etape-num">3</div>
                             <div class="etape-texte">
-                                <strong>Sauvegardez</strong> le fichier en .xlsx ou exportez-le
-                                en .csv (Format CSV UTF-8).
+                                <strong>Sélectionnez le niveau</strong> correspondant à la liste
+                                (ex: Info 1, Télécom 2...) et choisissez votre fichier.
                             </div>
                         </div>
                         <div class="etape">
                             <div class="etape-num">4</div>
                             <div class="etape-texte">
-                                <strong>Sélectionnez le niveau</strong>, choisissez votre fichier
-                                et cliquez sur "Lancer l'import".
+                                Après l'import, allez dans <strong>Gérer les groupes</strong> pour
+                                assigner G1 ou G2 à chaque étudiant.
                             </div>
                         </div>
                         <div class="etape">
                             <div class="etape-num">5</div>
                             <div class="etape-texte">
-                                Chaque étudiant importé reçoit comme
-                                <strong>mot de passe temporaire son matricule</strong>.
-                                Il devra le changer à la première connexion.
+                                Les étudiants déjà importés sont <strong>ignorés automatiquement</strong>
+                                (pas de doublon sur le matricule).
                             </div>
                         </div>
-
-                        <a href="#" class="btn btn-outline" style="margin-top:8px;">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            Télécharger le modèle Excel
-                        </a>
                     </div>
                 </div>
 
+                <!-- Exemple de format attendu -->
                 <div class="card">
-                    <div class="card-header"><h3>Exemple de fichier CSV</h3></div>
+                    <div class="card-header"><h3>Format du fichier FST attendu</h3></div>
                     <div class="card-body">
-                        <div style="background:#f8f9fa;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#4a4a6a;line-height:1.8;">
-                            Nom;Prenom;Email;Matricule;Telephone<br/>
-                            Magagi;Dayyana;jineidoumagagingaridayyanantou@gmail.com;2204017;70123456<br/>
-                            Sanda;Amadou;asanda@gmail.com.;2406043;89456789<br/>
-                            Diallo;Aissata;adiallo@gmail.com;2204013;
+                        <div style="background:#f8f9fa;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#4a4a6a;line-height:2;">
+                            UNIVERSITE ISLAMIQUE AU NIGER<br/>
+                            FACULTE DES SCIENCES ET TECHNIQUES<br/>
+                            LES ETUDIANTS INSCRITS EN PREMIERE ANNEE<br/>
+                            DEPARTEMENT INFORMATIQUE<br/>
+                            ANNEE UNIVERSITAIRE : 2025 / 2026<br/>
+                            LISTE DES ETUDIANTS<br/>
+                            <span style="color:#0F6E56;font-weight:bold;">N° &nbsp;&nbsp; Matricule &nbsp;&nbsp;&nbsp; Nom et prénoms</span><br/>
+                            1 &nbsp;&nbsp;&nbsp; INF 2504001 &nbsp; Abdoulaye Fodi Hadiza<br/>
+                            2 &nbsp;&nbsp;&nbsp; INF 2504002 &nbsp; Abdouramane Boubacar...<br/>
                         </div>
+                        <p style="font-size:11px;color:#7f8c8d;margin-top:8px;">
+                            ✓ Les 6 premières lignes sont ignorées automatiquement.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -248,14 +231,6 @@
     </div>
 </div>
 
-<script>
-    function afficherFichier(input) {
-      const p = document.getElementById('nom-fichier');
-      if (input.files.length > 0) {
-        p.textContent = '✓ Fichier sélectionné : ' + input.files[0].name;
-      }
-    }
-</script>
-
+<script src="/js/import.js"></script>
 </body>
 </html>

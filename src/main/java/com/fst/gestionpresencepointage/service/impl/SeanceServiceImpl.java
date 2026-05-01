@@ -148,4 +148,72 @@ public class SeanceServiceImpl implements SeanceService {
                 .map(SeanceDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<SeanceDto> getPlanningParDepartement(Long departementId) {
+        return seanceRepository.findPlanningByDepartement(departementId)
+                .stream().map(SeanceDto::fromEntity).toList();
+    }
+
+    @Override
+    public List<SeanceDto> getPlanningParEnseignant(Long enseignantId) {
+        return seanceRepository
+                .findByEnseignantIdAndRecurrenteTrue(enseignantId)
+                .stream().map(SeanceDto::fromEntity).toList();
+    }
+
+    @Override
+    public SeanceDto creerSeancePlanifiee(SeanceDto dto) {
+        // Calcul automatique heure début à partir du jour
+        Seance seance = new Seance();
+        seance.setJourSemaine(dto.getJourSemaine());
+        seance.setHeureDebut(dto.getHeureDebut());
+        seance.setHeureFin(dto.getHeureFin());
+        seance.setTypeSeance(dto.getTypeSeance());
+        seance.setRecurrente(true);
+        seance.setDateFinSemestre(dto.getDateFinSemestre());
+
+        // Date de la prochaine occurrence du jour choisi
+        seance.setDateSeance(
+                prochainJour(dto.getJourSemaine()));
+
+        ModuleCours module = moduleCoursRepository.findById(dto.getModuleId())
+                .orElseThrow(() -> new RuntimeException("Module introuvable."));
+        seance.setModuleCours(module);
+
+        // Enseignant = enseignant responsable du module
+        if (module.getEnseignantResponsable() != null) {
+            seance.setEnseignant(module.getEnseignantResponsable());
+        } else {
+            // Sinon utiliser l'enseignantId fourni
+            if (dto.getEnseignantId() != null) {
+                enseignantRepository.findById(dto.getEnseignantId())
+                        .ifPresent(seance::setEnseignant);
+            }
+        }
+
+        if (dto.getSalleId() != null) {
+            salleRepository.findById(dto.getSalleId())
+                    .ifPresent(seance::setSalle);
+        }
+
+        return SeanceDto.fromEntity(seanceRepository.save(seance));
+    }
+
+    // Calcule la date de la prochaine occurrence d'un jour
+    private LocalDate prochainJour(String jourSemaine) {
+        java.time.DayOfWeek dow = switch (jourSemaine.toUpperCase()) {
+            case "LUNDI"    -> java.time.DayOfWeek.MONDAY;
+            case "MARDI"    -> java.time.DayOfWeek.TUESDAY;
+            case "MERCREDI" -> java.time.DayOfWeek.WEDNESDAY;
+            case "JEUDI"    -> java.time.DayOfWeek.THURSDAY;
+            case "VENDREDI" -> java.time.DayOfWeek.FRIDAY;
+            case "SAMEDI"   -> java.time.DayOfWeek.SATURDAY;
+            default -> java.time.DayOfWeek.MONDAY;
+        };
+        LocalDate today = LocalDate.now();
+        // Si aujourd'hui est le bon jour → aujourd'hui, sinon prochain
+        if (today.getDayOfWeek() == dow) return today;
+        return today.with(java.time.temporal.TemporalAdjusters.next(dow));
+    }
 }

@@ -39,6 +39,8 @@ public class Etudiant extends Utilisateur {
     @Column(length = 150)
     private String personneAContacter;//Personne à contacter si besoin.
 
+    @Column(length = 10)
+    private String groupe; // "G1", "G2", null
 
     /**
      * Plusieurs étudiants peuvent appartenir à un même département.

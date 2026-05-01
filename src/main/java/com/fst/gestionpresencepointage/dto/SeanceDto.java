@@ -31,6 +31,13 @@ public class SeanceDto {
     private Long salleId;
     private String salleNumero;
 
+    private String jourSemaine;
+    private LocalDate dateFinSemestre;
+    private boolean recurrente;
+    private String statut;
+    private String moduleNiveau;
+    private String moduleGroupe;
+
     public static SeanceDto fromEntity(Seance seance) {
         return SeanceDto.builder()
                 .id(seance.getId())
@@ -51,6 +58,14 @@ public class SeanceDto {
                         ? seance.getSalle().getId() : null)
                 .salleNumero(seance.getSalle() != null
                         ? seance.getSalle().getNumero() : null)
+                .jourSemaine(seance.getJourSemaine())
+                .dateFinSemestre(seance.getDateFinSemestre())
+                .recurrente(seance.isRecurrente())
+                .statut(seance.getStatut() != null ? seance.getStatut().name() : null)
+                .moduleNiveau(seance.getModuleCours() != null
+                        ? seance.getModuleCours().getNiveau() : null)
+                .moduleGroupe(seance.getModuleCours() != null
+                        ? seance.getModuleCours().getGroupe() : null)
                 .build();
     }
 }

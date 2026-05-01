@@ -52,4 +52,16 @@ public interface SeanceRepository extends JpaRepository<Seance, Long> {
             @Param("fin") LocalDate fin,
             @Param("departementId") Long departementId
     );
+
+    // Séances du planning par enseignant (récurrentes)
+    List<Seance> findByEnseignantIdAndRecurrenteTrue(Long enseignantId);
+
+    // Séances récurrentes d'un département
+    @Query("SELECT s FROM Seance s " +
+            "JOIN s.moduleCours m " +
+            "WHERE m.departement.id = :departementId " +
+            "AND s.recurrente = true " +
+            "ORDER BY s.jourSemaine, s.heureDebut")
+    List<Seance> findPlanningByDepartement(
+            @Param("departementId") Long departementId);
 }

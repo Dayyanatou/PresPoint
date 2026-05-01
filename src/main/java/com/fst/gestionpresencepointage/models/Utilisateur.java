@@ -52,8 +52,7 @@ public class Utilisateur {
     private String prenom;
 
     @Email
-    @NotBlank
-    @Column(nullable = false, length = 150, unique = true)
+    @Column(nullable = true, length = 150, unique = true)
     private String email;
 
     @NotBlank

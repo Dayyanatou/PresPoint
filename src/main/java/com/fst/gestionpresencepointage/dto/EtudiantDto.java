@@ -35,6 +35,9 @@ public class EtudiantDto {
     private LocalDate dateNaissance;
     private String personneAContacter;
 
+    private Boolean premiereConnexion;
+    private String groupe;
+
     // Département
     private Long departementId;
     private String departementNom;
@@ -61,6 +64,8 @@ public class EtudiantDto {
                 .dateNaissance(etudiant.getDateNaissance())
                 .personneAContacter(etudiant.getPersonneAContacter())
 
+                .premiereConnexion(etudiant.isPremiereConnexion())
+                .groupe(etudiant.getGroupe())
                 .departementId(etudiant.getDepartement() != null
                         ? etudiant.getDepartement().getId()
                         : null)
@@ -95,6 +100,9 @@ public class EtudiantDto {
         etudiant.setDateNaissance(this.dateNaissance);
         etudiant.setPersonneAContacter(this.personneAContacter);
 
+        etudiant.setPremiereConnexion(
+                this.premiereConnexion != null ? this.premiereConnexion : true);
+        etudiant.setGroupe(this.groupe);
         return etudiant;
     }
 }
