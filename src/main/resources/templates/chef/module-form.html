@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Module — Formulaire</title>
+    <link href="/css/modules-chef.css" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Chef de Département — FST</div>
+    </div>
+    <div class="user-block">
+        <div class="avatar">CD</div>
+        <div>
+            <div class="u-name">Chef de Département</div>
+            <div class="u-info">Administration</div>
+        </div>
+    </div>
+    <div class="nav-section">Tableau de bord</div>
+    <a th:href="@{/chef/dashboard/{id}(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Vue d'ensemble
+    </a>
+    <div class="nav-section">Gestion</div>
+    <a th:href="@{/chef/departement/{id}/etudiants(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Étudiants
+    </a>
+    <a th:href="@{/chef/departement/{id}/modules(id=${departementId})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Modules
+    </a>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="topbar">
+        <h1 th:text="${module != null ? 'Modifier le module' : 'Nouveau module'}">
+            Nouveau module
+        </h1>
+        <a th:href="@{/chef/departement/{id}/modules(id=${departementId})}"
+           class="btn btn-outline btn-sm">← Retour</a>
+    </div>
+
+    <div class="page-content">
+
+        <div class="alert-error" th:if="${erreur}" th:text="${erreur}"></div>
+
+        <div class="card" style="max-width:700px;">
+            <div class="card-header">
+                <h3 th:text="${module != null ? 'Modifier : ' + module.intitule : 'Informations du module'}">
+                    Informations du module
+                </h3>
+            </div>
+            <div class="card-body">
+
+                <!-- URL dynamique : création ou modification -->
+                <form th:action="${module != null}
+                        ? @{/chef/departement/{depId}/modules/{modId}/modifier(depId=${departementId},modId=${module.id})}
+                        : @{/chef/departement/{id}/modules/nouveau(id=${departementId})}"
+                      method="post">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Code du module *</label>
+                            <input type="text" name="code" required
+                                   placeholder="ex: INFO201"
+                                   th:value="${module != null ? module.code : ''}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Volume horaire (heures) *</label>
+                            <input type="number" name="volumeHoraire" required
+                                   min="1" max="200"
+                                   placeholder="ex: 30"
+                                   th:value="${module != null ? module.volumeHoraire : ''}"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Intitulé du module *</label>
+                        <input type="text" name="intitule" required
+                               placeholder="ex: Algorithmique et Structures de Données"
+                               th:value="${module != null ? module.intitule : ''}"/>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Niveau *</label>
+                            <select name="niveau" required>
+                                <option value="">-- Choisir le niveau --</option>
+                                <option th:each="niv : ${niveaux}"
+                                        th:value="${niv}"
+                                        th:text="${niv}"
+                                        th:selected="${module != null and module.niveau == niv}">
+                                    Info 1
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Groupe</label>
+                            <select name="groupe">
+                                <option value="">Commun (G1 et G2)</option>
+                                <option value="G1"
+                                        th:selected="${module != null and module.groupe == 'G1'}">
+                                    G1 uniquement
+                                </option>
+                                <option value="G2"
+                                        th:selected="${module != null and module.groupe == 'G2'}">
+                                    G2 uniquement
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Semestre *</label>
+                            <select name="semestre" required>
+                                <option value="">-- Choisir --</option>
+                                <option th:each="sem : ${semestres}"
+                                        th:value="${sem}"
+                                        th:text="${sem}"
+                                        th:selected="${module != null and module.semestre == sem}">
+                                    S1
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Enseignant responsable</label>
+                            <select name="enseignantId">
+                                <option value="">-- Non assigné --</option>
+                                <option th:each="ens : ${enseignants}"
+                                        th:value="${ens.id}"
+                                        th:text="${ens.prenom + ' ' + ens.nom}"
+                                        th:selected="${module != null
+                                            and module.enseignantResponsable != null
+                                            and module.enseignantResponsable.id == ens.id}">
+                                    M. Diallo
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;margin-top:8px;">
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span th:text="${module != null ? 'Enregistrer les modifications' : 'Créer le module'}">
+                                Créer le module
+                            </span>
+                        </button>
+                        <a th:href="@{/chef/departement/{id}/modules(id=${departementId})}"
+                           class="btn btn-outline">Annuler</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

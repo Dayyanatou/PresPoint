@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Modules — Chef de Département</title>
+    <link href="/css/modules-chef.css" rel="stylesheet"/>
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Chef de Département — FST</div>
+    </div>
+    <div class="user-block">
+        <div class="avatar">CD</div>
+        <div>
+            <div class="u-name">Chef de Département</div>
+            <div class="u-info">Administration</div>
+        </div>
+    </div>
+    <div class="nav-section">Tableau de bord</div>
+    <a th:href="@{/chef/dashboard/{id}(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Vue d'ensemble
+    </a>
+    <div class="nav-section">Gestion</div>
+    <a th:href="@{/chef/departement/{id}/etudiants(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Étudiants
+    </a>
+    <a th:href="@{/chef/departement/{id}/groupes(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Groupes
+    </a>
+    <a th:href="@{/chef/departement/{id}/modules(id=${departementId})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Modules
+    </a>
+    <a th:href="@{/chef/departement/{id}/import(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Importer étudiants
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="topbar">
+        <h1>Modules de cours</h1>
+        <div class="topbar-right">
+            <!-- Filtre par niveau -->
+            <form th:action="@{/chef/departement/{id}/modules(id=${departementId})}"
+                  method="get" style="display:flex;gap:8px;align-items:center;">
+                <select name="niveau" class="filter-select" onchange="this.form.submit()">
+                    <option value="">Tous les niveaux</option>
+                    <option th:each="niv : ${niveauxDisponibles}"
+                            th:value="${niv}"
+                            th:text="${niv}"
+                            th:selected="${niv == niveauSelectionne}">Info 1</option>
+                </select>
+            </form>
+            <a th:href="@{/chef/departement/{id}/modules/nouveau(id=${departementId})}"
+               class="btn btn-primary btn-sm">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nouveau module
+            </a>
+        </div>
+    </div>
+
+    <div class="page-content">
+
+        <div class="alert-success" th:if="${succes}" th:text="${succes}"></div>
+        <div class="alert-error"   th:if="${erreur}" th:text="${erreur}"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    Liste des modules
+                    <span th:if="${niveauSelectionne != null and !niveauSelectionne.isEmpty()}"
+                          th:text="' — ' + ${niveauSelectionne}" style="color:#0F6E56;"></span>
+                </h3>
+                <span style="font-size:12px;color:#7f8c8d;"
+                      th:text="${modules.size() + ' module(s)'}">0 module(s)</span>
+            </div>
+
+            <div class="empty-msg" th:if="${#lists.isEmpty(modules)}">
+                Aucun module.
+                <a th:href="@{/chef/departement/{id}/modules/nouveau(id=${departementId})}"
+                   style="color:#0F6E56;font-weight:600;">Créer le premier module →</a>
+            </div>
+
+            <table th:unless="${#lists.isEmpty(modules)}">
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Intitulé</th>
+                    <th>Niveau</th>
+                    <th>Groupe</th>
+                    <th>Semestre</th>
+                    <th>Volume H.</th>
+                    <th>Enseignant</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="module : ${modules}">
+                    <td class="cell-muted" th:text="${module.code}">INFO201</td>
+                    <td><strong th:text="${module.intitule}">Algorithmique</strong></td>
+                    <td>
+                        <span class="badge badge-blue"
+                              th:text="${module.niveau}">Info 1</span>
+                    </td>
+                    <td>
+                        <span th:if="${module.groupe != null}"
+                              class="badge badge-purple"
+                              th:text="${module.groupe}">G1</span>
+                        <span th:if="${module.groupe == null}"
+                              class="badge badge-gray">Commun</span>
+                    </td>
+                    <td th:text="${module.semestre}">S2</td>
+                    <td th:text="${module.volumeHoraire + 'h'}">30h</td>
+                    <td>
+                        <span th:if="${module.enseignantResponsable != null}"
+                              th:text="${module.enseignantResponsable.prenom + ' ' + module.enseignantResponsable.nom}">
+                            M. Diallo
+                        </span>
+                        <span th:if="${module.enseignantResponsable == null}"
+                              class="cell-muted">—</span>
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a th:href="@{/chef/departement/{depId}/modules/{modId}/modifier(depId=${departementId},modId=${module.id})}"
+                               class="btn btn-outline btn-sm">Modifier</a>
+                            <form th:action="@{/chef/departement/{depId}/modules/{modId}/supprimer(depId=${departementId},modId=${module.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Supprimer ce module ?')">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

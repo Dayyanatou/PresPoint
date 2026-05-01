@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestion des groupes</title>
+    <link href="/css/etudiants-chef.css" rel="stylesheet"/>
+    <style>
+        .action-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
+        .check-col { width: 40px; text-align: center; }
+        input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#0F6E56; }
+        .groupe-badge-g1 { background:#cce5ff; color:#004085; }
+        .groupe-badge-g2 { background:#d4edda; color:#155724; }
+        .btn-g1 { background:#004085; color:#fff; }
+        .btn-g2 { background:#155724; color:#fff; }
+        .btn-danger { background:#dc3545; color:#fff; }
+        .info-box { background:#d1ecf1; border:1px solid #bee5eb; border-radius:8px; padding:12px; font-size:12px; color:#0c5460; margin-bottom:1rem; }
+    </style>
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="sidebar-top">
+        <div class="app-logo">PresPoint</div>
+        <div class="app-sub">Chef de Département — FST</div>
+    </div>
+    <div class="user-block">
+        <div class="avatar">CD</div>
+        <div>
+            <div class="u-name">Chef de Département</div>
+            <div class="u-info">Administration</div>
+        </div>
+    </div>
+    <div class="nav-section">Tableau de bord</div>
+    <a th:href="@{/chef/dashboard/{id}(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Vue d'ensemble
+    </a>
+    <div class="nav-section">Gestion</div>
+    <a th:href="@{/chef/departement/{id}/etudiants(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Étudiants
+    </a>
+    <a th:href="@{/chef/departement/{id}/groupes(id=${departementId})}" class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Groupes
+    </a>
+    <a th:href="@{/chef/departement/{id}/import(id=${departementId})}" class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Importer étudiants
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+        <a href="/login" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="topbar">
+        <h1>Gestion des groupes G1 / G2</h1>
+        <!-- Filtre par niveau -->
+        <form th:action="@{/chef/departement/{id}/groupes(id=${departementId})}"
+              method="get" style="display:flex;gap:8px;align-items:center;">
+            <select name="niveau" class="filter-select" onchange="this.form.submit()">
+                <option value="">-- Choisir un niveau --</option>
+                <option th:each="niv : ${niveauxDisponibles}"
+                        th:value="${niv}"
+                        th:text="${niv}"
+                        th:selected="${niv == niveauSelectionne}">Info 1</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="page-content">
+
+        <!-- Messages -->
+        <div class="alert-success" th:if="${succes}" th:text="${succes}"></div>
+        <div class="alert-error"   th:if="${erreur}" th:text="${erreur}"></div>
+
+        <!-- Guide -->
+        <div class="info-box" th:if="${niveauSelectionne == null or niveauSelectionne.isEmpty()}">
+            👆 Sélectionnez un niveau pour commencer à assigner les groupes.
+        </div>
+
+        <!-- Contenu si niveau sélectionné -->
+        <div th:if="${niveauSelectionne != null and !niveauSelectionne.isEmpty()}">
+
+            <div class="info-box">
+                <strong>Mode d'emploi :</strong>
+                Cochez les étudiants → cliquez sur "Assigner G1" ou "Assigner G2".
+                Les étudiants non cochés ne sont pas modifiés.
+                Vous pouvez faire plusieurs sélections successives.
+            </div>
+
+            <!-- Formulaire principal avec les cases à cocher -->
+            <form id="form-groupes"
+                  th:action="@{/chef/departement/{id}/groupes/assigner(id=${departementId})}"
+                  method="post">
+
+                <!-- Champ caché pour transmettre le niveau et le groupe choisi -->
+                <input type="hidden" name="niveau" th:value="${niveauSelectionne}"/>
+                <input type="hidden" name="groupe" id="groupe-choisi" value="G1"/>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 th:text="'Étudiants — ' + ${niveauSelectionne}">Info 1</h3>
+                        <span style="font-size:12px;color:#7f8c8d;"
+                              th:text="${etudiants.size() + ' étudiant(s)'}">0</span>
+                    </div>
+                    <!-- Barre d'actions -->
+                    <div class="action-bar" style="padding:12px 1.25rem;border-bottom:1px solid #e8ecf0;">
+
+                        <!-- Tout sélectionner / désélectionner -->
+                        <button type="button" class="btn btn-outline btn-sm"
+                                onclick="toutSelectionner()">Tout sélectionner</button>
+                        <button type="button" class="btn btn-outline btn-sm"
+                                onclick="toutDeselectionner()">Tout désélectionner</button>
+
+                        <div style="flex:1;"></div>
+
+                        <!-- ✅ NOUVEAU : case mode correction -->
+                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;
+                  color:#4a4a6a;cursor:pointer;margin-right:8px;">
+                            <input type="checkbox" id="mode-correction"
+                                   name="modeCorrection" value="true"
+                                   style="width:16px;height:16px;accent-color:#0F6E56;"/>
+                            Mode correction
+                            <span style="font-size:11px;color:#7f8c8d;">
+            (ne touche pas les autres)
+        </span>
+                        </label>
+
+                        <!-- Boutons d'assignation -->
+                        <button type="button" class="btn btn-g1 btn-sm"
+                                onclick="soumettre('G1')">
+                            ✓ Assigner G1
+                        </button>
+                        <button type="button" class="btn btn-g2 btn-sm"
+                                onclick="soumettre('G2')">
+                            ✓ Assigner G2
+                        </button>
+                    </div>
+
+                    <!-- Compteur sélection -->
+                    <div style="padding:8px 1.25rem;font-size:12px;color:#7f8c8d;background:#f8f9fa;">
+                        <span id="compteur">0</span> étudiant(s) sélectionné(s)
+                    </div>
+
+                    <div class="empty-msg" th:if="${#lists.isEmpty(etudiants)}">
+                        Aucun étudiant pour ce niveau.
+                    </div>
+
+                    <table th:unless="${#lists.isEmpty(etudiants)}">
+                        <thead>
+                        <tr>
+                            <th class="check-col">
+                                <input type="checkbox" id="check-all"
+                                       onchange="toggleTout(this)"/>
+                            </th>
+                            <th>Nom complet</th>
+                            <th>Matricule</th>
+                            <th>Groupe actuel</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="etudiant : ${etudiants}">
+                            <td class="check-col">
+                                <!-- Chaque case envoie l'ID de l'étudiant -->
+                                <input type="checkbox"
+                                       name="etudiantIds"
+                                       th:value="${etudiant.id}"
+                                       class="etudiant-check"
+                                       onchange="majCompteur()"/>
+                            </td>
+                            <td th:text="${etudiant.prenom + ' ' + etudiant.nom}">Aïcha Moussa</td>
+                            <td class="cell-muted" th:text="${etudiant.matricule}">INF2504001</td>
+                            <td>
+                                <span th:if="${etudiant.groupe == 'G1'}"
+                                      class="badge groupe-badge-g1">G1</span>
+                                <span th:if="${etudiant.groupe == 'G2'}"
+                                      class="badge groupe-badge-g2">G2</span>
+                                <span th:if="${etudiant.groupe == null}"
+                                      class="badge badge-gray">Non assigné</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+
+            <!-- Réinitialiser les groupes du niveau -->
+            <form th:action="@{/chef/departement/{id}/groupes/reinitialiser(id=${departementId})}"
+                  method="post"
+                  onsubmit="return confirm('Réinitialiser tous les groupes du niveau ' + '[[${niveauSelectionne}]]' + ' ?')">
+                <input type="hidden" name="niveau" th:value="${niveauSelectionne}"/>
+                <button type="submit" class="btn btn-danger btn-sm">
+                    ↺ Réinitialiser les groupes de ce niveau
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Soumet le formulaire avec le bon groupe (G1 ou G2)
+    function soumettre(groupe) {
+        document.getElementById('groupe-choisi').value = groupe;
+        document.getElementById('form-groupes').submit();
+    }
+
+    // Toggle toutes les cases via la case principale
+    function toggleTout(checkbox) {
+        document.querySelectorAll('.etudiant-check')
+            .forEach(c => c.checked = checkbox.checked);
+        majCompteur();
+    }
+
+    // Tout sélectionner
+    function toutSelectionner() {
+        document.querySelectorAll('.etudiant-check')
+            .forEach(c => c.checked = true);
+        document.getElementById('check-all').checked = true;
+        majCompteur();
+    }
+
+    // Tout désélectionner
+    function toutDeselectionner() {
+        document.querySelectorAll('.etudiant-check')
+            .forEach(c => c.checked = false);
+        document.getElementById('check-all').checked = false;
+        majCompteur();
+    }
+
+    // Met à jour le compteur de sélection
+    function majCompteur() {
+        const nb = document.querySelectorAll('.etudiant-check:checked').length;
+        document.getElementById('compteur').textContent = nb;
+    }
+</script>
+
+</body>
+</html>
