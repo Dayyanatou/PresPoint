@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+# Keystore (clé de signature — CONFIDENTIEL)
+*.p12
+*.jks
+
+# Dossier uploads (fichiers des utilisateurs)
+uploads/

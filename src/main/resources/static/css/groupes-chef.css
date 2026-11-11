@@ -1,0 +1,13 @@
+/* Styles spécifiques à la page Gestion des groupes (chef/groupes.html) */
+/* Extrait directement du <style> qui était écrit dans la page elle-même */
+/* Complète etudiants-chef.css (chargé en base sur cette page) */
+
+.action-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
+.check-col { width: 40px; text-align: center; }
+input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#0F6E56; }
+.groupe-badge-g1 { background:#cce5ff; color:#004085; }
+.groupe-badge-g2 { background:#d4edda; color:#155724; }
+.btn-g1 { background:#004085; color:#fff; }
+.btn-g2 { background:#155724; color:#fff; }
+.btn-danger { background:#dc3545; color:#fff; }
+.info-box { background:#d1ecf1; border:1px solid #bee5eb; border-radius:8px; padding:12px; font-size:12px; color:#0c5460; margin-bottom:1rem; }
